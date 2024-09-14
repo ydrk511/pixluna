@@ -1,14 +1,14 @@
 {
   "name": "@q78kg/koishi-plugin-pixiv",
   "description": "从 Pixiv 中随机获取图片",
-  "version": "2.0.5-beta.4",
+  "version": "2.0.5-beta.6",
   "main": "lib/index.cjs",
   "module": "lib/index.mjs",
   "exports": {
     ".": {
       "import": "./lib/index.mjs",
-      "require": "./lib/index.cjs",
-      "types": "./lib/index.d.ts"
+      "types": "./lib/index.d.ts",
+      "require": "./lib/index.cjs"
     },
     "./package.json": "./package.json"
   },
