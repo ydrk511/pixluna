@@ -1,7 +1,7 @@
 import { Context, h, Random } from "koishi";
 import type { } from "@koishijs/plugin-proxy-agent";
 import Config from "../config";
-import { Lolicon, LoliconRequest, SourceProvider } from "../types/type";
+import { Lolicon, SourceProvider } from "../utils/type";
 import {
   getImageMimeType,
   IMAGE_MINE_TYPE,
@@ -45,25 +45,29 @@ export async function getRemoteImage(ctx: Context, tag: string, config: Config, 
   }
 
   const response = metadata.data;
-  const {url, urls} = response;
+  const { url, urls } = response;
 
   const data = await taskTime(ctx, "mixImage", async () => {
     const imageBufferArray = await fetchImageBuffer(ctx, config, url);
 
+    // If imageConfusion is enabled, process the image using mixImage and return the Buffer directly
     if (config.imageConfusion && sharp) {
-      return await mixImage(
+      const processedImageBuffer = await mixImage(
         ctx,
         imageBufferArray,
         config.compress && !urls.regular,
       );
+      return h.image(processedImageBuffer, getImageMimeType(imageBufferArray[1]));
     }
 
-    return h.image(
-      config.compress && !urls.regular && sharp
-        ? await qualityImage(ctx, imageBufferArray[0], imageBufferArray[1])
-        : imageBufferArray[0],
-      getImageMimeType(imageBufferArray[1]),
-    );
+    // If only compression is enabled, apply qualityImage to reduce image size
+    if (config.compress && !urls.regular && sharp) {
+      const compressedImageBuffer = await qualityImage(ctx, imageBufferArray[0], imageBufferArray[1]);
+      return h.image(compressedImageBuffer, getImageMimeType(imageBufferArray[1]));
+    }
+
+    // Otherwise, return the original image buffer
+    return h.image(imageBufferArray[0], getImageMimeType(imageBufferArray[1]));
   });
 
   return {
@@ -88,4 +92,3 @@ async function fetchImageBuffer(
     return [response, getImageMimeType(extension)];
   });
 }
-

@@ -1,4 +1,4 @@
-import { Context, h } from "koishi";
+import { Context } from "koishi";
 import sharp from "sharp"; // Import sharp library directly
 
 const IMAGE_MINE_TYPE_MAP = {
@@ -32,7 +32,6 @@ export async function qualityImage(
   }
 
   image.destroy();
-
   image = undefined;
 
   return qualifiedImage;
@@ -88,17 +87,7 @@ export async function mixImage(
   const processedImageBuffer = await image.png().toBuffer();
 
   image.destroy();
-
   image = undefined;
 
-  return bufferToDataUrl(processedImageBuffer, imageType);
-}
-
-export async function bufferToDataUrl(
-  buffer: ArrayBuffer,
-  mimeType: IMAGE_MINE_TYPE,
-) {
-  const base64 = Buffer.from(buffer).toString("base64");
-
-  return `data:${IMAGE_MINE_TYPE_MAP[mimeType]};base64,${base64}`;
+  return processedImageBuffer; // 直接返回处理后的 Buffer
 }

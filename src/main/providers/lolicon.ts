@@ -1,7 +1,7 @@
 import { Context } from "koishi";
 import type { Config } from "../../config";  // 确保导入的是类型
-import type { CommonSourceRequest, ImageMetaData, LoliconRequest, SourceResponse } from "../../types/type";
-import { SourceProvider } from "../../types/type";
+import type { CommonSourceRequest, ImageMetaData, LoliconRequest, SourceResponse } from "../../utils/type";
+import { SourceProvider } from "../../utils/type";
 
 export class LoliconSourceProvider extends SourceProvider {
   static RANDOM_IMAGE_URL = "https://api.lolicon.app/setu/v2";
