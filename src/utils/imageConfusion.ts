@@ -1,19 +1,19 @@
 import { Context } from "koishi";
 import sharp from "sharp"; // Import sharp library directly
 
-const IMAGE_MINE_TYPE_MAP = {
+const IMAGE_MIME_TYPE_MAP = {
   jpg: "image/jpeg",
   jpeg: "image/jpeg",
   png: "image/png",
   gif: "image/gif",
 };
 
-export type IMAGE_MINE_TYPE = keyof typeof IMAGE_MINE_TYPE_MAP;
+export type IMAGE_MINE_TYPE = keyof typeof IMAGE_MIME_TYPE_MAP;
 
 export function getImageMimeType(
   extension: string,
-): keyof typeof IMAGE_MINE_TYPE_MAP {
-  return IMAGE_MINE_TYPE_MAP[extension] || "application/octet-stream";
+): keyof typeof IMAGE_MIME_TYPE_MAP {
+  return IMAGE_MIME_TYPE_MAP[extension] || "application/octet-stream";
 }
 
 export async function qualityImage(
@@ -57,21 +57,17 @@ export async function mixImage(
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  // 选择右下角1*1像素
-  const startX = Math.max(0, width - 1);
-  const startY = Math.max(0, height - 1);
+  // 随机选择一个点进行修改
+  const randomX = Math.floor(Math.random() * width);
+  const randomY = Math.floor(Math.random() * height);
+  const idx = (randomY * width + randomX) * info.channels;
 
-  for (let y = startY; y < height; y++) {
-    for (let x = startX; x < width; x++) {
-      const idx = (y * width + x) * info.channels;
-      // 修改 R 通道
-      data[idx] = data[idx] + 1 <= 255 ? data[idx] + 1 : data[idx] - 1;
-      // 修改 G 通道
-      data[idx + 1] = data[idx + 1] + 1 <= 255 ? data[idx + 1] + 1 : data[idx + 1] - 1;
-      // 修改 B 通道
-      data[idx + 2] = data[idx + 2] + 1 <= 255 ? data[idx + 2] + 1 : data[idx + 2] - 1;
-    }
-  }
+  // 修改 R 通道
+  data[idx] = data[idx] + 1 <= 255 ? data[idx] + 1 : data[idx] - 1;
+  // 修改 G 通道
+  data[idx + 1] = data[idx + 1] + 1 <= 255 ? data[idx + 1] + 1 : data[idx + 1] - 1;
+  // 修改 B 通道
+  data[idx + 2] = data[idx + 2] + 1 <= 255 ? data[idx + 2] + 1 : data[idx + 2] - 1;
 
   // 释放内存
   image.destroy();
