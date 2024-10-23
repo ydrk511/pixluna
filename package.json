@@ -1,7 +1,7 @@
 {
-  "name": "@q78kg/koishi-plugin-pixiv",
-  "description": "使用 Lolicon API 从 Pixiv 中随机获取图片",
-  "version": "2.0.6-beta.2",
+  "name": "koishi-plugin-pixluna",
+  "description": "比较新的涩图插件（？",
+  "version": "2.0.7",
   "main": "lib/index.cjs",
   "module": "lib/index.mjs",
   "exports": {
@@ -23,7 +23,8 @@
     "pixiv",
     "koishi",
     "plugin",
-    "色图"
+    "色图",
+    "pixluna"
   ],
   "peerDependencies": {
     "@koishijs/plugin-proxy-agent": "^0.3.3",
@@ -39,7 +40,7 @@
   },
   "koishi": {
     "description": {
-      "zh": "使用 Lolicon API 从 Pixiv 中随机获取图片"
+      "zh": "比较新的涩图插件（？"
     }
   }
 }
