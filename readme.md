@@ -1,8 +1,12 @@
-# @q78kg/koishi-plugin-pixiv
+<div align="center">
 
-[![npm](https://img.shields.io/npm/v/@q78kg/koishi-plugin-pixiv?style=flat-square)](https://www.npmjs.com/package/@q78kg/koishi-plugin-pixiv)
+<img src="./Image_1727599920514.png">
 
-从 Pixiv 中随机获取一张图片
+<i>多图源整合式涩图插件！（正在开发中）</i>
+
+[![npm](https://img.shields.io/npm/v/koishi-plugin-pixluna?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-pixluna)
+
+</div>
 
 ## 功能
 
@@ -14,6 +18,13 @@
 - [x] 多并发获取图片
 - [x] 可选是否以转发的形式打包发送图片
 - [x] 压缩图片（开启后不发送原图，提升发送速度）
+
+## TODO（画饼 ing...）
+
+- [ ] 支持更多的平台
+- [ ] 提供接入图源的统一接口
+- [ ] 重构屎山代码
+- [ ] 自主判断平台是否能够支持以转发的方式打包发送
 
 ## 配置项
 
@@ -32,21 +43,21 @@
 
 ## 使用方法
 
-指令为来张色图，输入来张色图即可，后面可以跟上关键词
+指令为 `pixluna` ，输入 `pixluna` 即可，后面可以跟上关键词
 如
 ```
-来张色图 黑丝
+pixluna 黑丝
 ```
 即可随机获取一张黑丝的图片
 
 -n 选项为指定获取的图片数量，默认为一张，最大不超过10张，如
 ```
-来张色图 -n 5 黑丝
+pixluna -n 5 黑丝
 ```
 即可随机获取5张黑丝的图片，关键词一定要放在最后面
 
 ## 贡献者名单
 
-<a href="https://github.com/Hoshino-Yumetsuki/koishi-plugin-pixiv/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Hoshino-Yumetsuki/koishi-plugin-pixiv" />
+<a href="https://github.com/Hoshino-Yumetsuki/pixluna/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Hoshino-Yumetsuki/pixluna" />
 </a>
