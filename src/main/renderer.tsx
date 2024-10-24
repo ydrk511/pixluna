@@ -2,6 +2,22 @@ import { Context, h } from "koishi";
 import Config from "../config";
 import { getRemoteImage } from "./request";
 import { provider } from "./providers"; // 直接引入锁定的 provider
+import { Lolicon } from "../utils/type";
+
+function renderImageMessage(image: Lolicon & { data: string | h }): h {
+  const data = typeof image.data === "string"
+    ? h("image", { url: image.data })
+    : image.data;
+
+  return h("message", [
+    data,
+    h("text", { content: `\ntitle：${image.title}\n` }),
+    h("text", { content: `id：${image.pid}\n` }),
+    h("text", {
+      content: `tags：${image.tags.map((item: string) => "#" + item).join(" ")}\n`,
+    }),
+  ]);
+}
 
 export async function render(ctx: Context, config: Config, tag: string) {
   try {
@@ -13,19 +29,7 @@ export async function render(ctx: Context, config: Config, tag: string) {
 
     ctx.logger.debug("image " + JSON.stringify(image));
 
-    const data =
-      typeof image.data === "string"
-        ? h("image", { url: image.data })
-        : image.data;
-
-    return h("message", [
-      data,
-      h("text", { content: `\ntitle：${image.title}\n` }),
-      h("text", { content: `id：${image.pid}\n` }),
-      h("text", {
-        content: `tags：${image.tags.map((item: string) => "#" + item).join(" ")}\n`,
-      }),
-    ]);
+    return renderImageMessage(image);
   } catch (e) {
     ctx.logger.error(e);
 

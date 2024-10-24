@@ -1,5 +1,5 @@
 import { Context } from "koishi";
-import type { Config } from "../../config";  // 确保导入的是类型
+import type { Config } from "../../config";
 import type { CommonSourceRequest, ImageMetaData, LoliconRequest, SourceResponse } from "../../utils/type";
 import { SourceProvider } from "../../utils/type";
 
