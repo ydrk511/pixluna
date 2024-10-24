@@ -11,6 +11,7 @@ export interface Config {
   maxConcurrency: number;
   forwardMessage: boolean;
   compress: boolean;
+  sourceProvider: 'none' | 'lolicon';
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -66,6 +67,14 @@ export const Config: Schema<Config> = Schema.intersect([
       .default("i.pixiv.re")
       .description("图片反代服务的地址。"),
   }).description("代理设置"),
+
+  // 图源设置
+  Schema.object({
+    sourceProvider: Schema.union([
+      Schema.const('none').description('无（占位选项）'),
+      Schema.const('lolicon').description('Lolicon API'),
+    ]).description('选择图片来源').default('lolicon'),
+  }).description('图源设置'),
 ]);
 
 export const name = "pixiv";

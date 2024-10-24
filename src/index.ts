@@ -3,7 +3,7 @@ import type Config from "./config";
 import { ParallelPool } from "./utils/data";
 import { render } from "./main/renderer";
 import { taskTime } from "./utils/data";
-import { LoliconSourceProvider } from "./main/providers/lolicon";
+import { getProvider } from "./main/providers";
 
 export function apply(ctx: Context, config: Config) {
   ctx
@@ -15,7 +15,15 @@ export function apply(ctx: Context, config: Config) {
     .action(async ({ session, options }, tag) => {
       await session.send("不可以涩涩哦~");
 
-      LoliconSourceProvider.getInstance<LoliconSourceProvider>().setConfig(config);
+      const provider = getProvider(config);
+      if (!provider) {
+        return h('', [
+          h('at', { id: session.userId }),
+          h('text', { content: ' 未选择有效的图片来源，请检查配置' })
+        ]);
+      }
+
+      provider.getInstance().config = config;
 
       const messages: h[] = [];
       const pool = new ParallelPool<void>(config.maxConcurrency);

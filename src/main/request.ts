@@ -5,13 +5,19 @@ import { getImageMimeType } from "../utils/getImageMimeType";
 import { taskTime } from "../utils/data";
 import { qualityImage, mixImage } from "../utils/imageProcessing";
 import { fetchImageBuffer } from "../utils/imageFetcher";
+import { getProvider } from "./providers";
 
 const RANDOM_IMAGE_URL = "https://api.lolicon.app/setu/v2";
 
-export async function getRemoteImage(ctx: Context, tag: string, config: Config, provider: typeof SourceProvider): Promise<Lolicon & {
+export async function getRemoteImage(ctx: Context, tag: string, config: Config): Promise<Lolicon & {
   data: string | h;
   raw: Lolicon;
 }> {
+  const provider = getProvider(config);
+  if (!provider) {
+    throw new Error("未选择有效的图片来源，请检查配置");
+  }
+
   let sharp;
   try {
     sharp = (await import("sharp"))?.default;

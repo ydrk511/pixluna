@@ -6,7 +6,14 @@ import { SourceProvider } from "../../utils/type";
 export class LoliconSourceProvider extends SourceProvider {
   static RANDOM_IMAGE_URL = "https://api.lolicon.app/setu/v2";
 
-  config: Config;
+  private _config: Config;
+
+  get config(): Config {
+    if (!this._config) {
+      throw new Error('Config not set. Please call setConfig before using the provider.');
+    }
+    return this._config;
+  }
 
   async getMetaData({ context }: { context: Context }, props: CommonSourceRequest): Promise<SourceResponse<ImageMetaData>> {
     const res = await context.http
@@ -39,6 +46,6 @@ export class LoliconSourceProvider extends SourceProvider {
   }
 
   setConfig(config: Config) {
-    this.config = config;
+    this._config = config;
   }
 }
