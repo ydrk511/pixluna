@@ -12,5 +12,5 @@ export const Providers: {
 };
 
 export function getProvider(config: Config): typeof SourceProvider {
-  return Providers[config.sourceProvider];
+  return Providers[config.defaultSourceProvider];
 }

@@ -3,7 +3,7 @@ import type Config from "./config";
 import { ParallelPool } from "./utils/data";
 import { render } from "./main/renderer";
 import { taskTime } from "./utils/data";
-import { getProvider } from "./main/providers";
+import { getProvider, Providers } from "./main/providers";
 
 export function apply(ctx: Context, config: Config) {
   ctx
@@ -11,19 +11,21 @@ export function apply(ctx: Context, config: Config) {
     .option("n", "-n <value:number>", {
       fallback: 1,
     })
+    .option("source", "-s <source:string>", { fallback: '' })
     .alias("色图")
     .action(async ({ session, options }, tag) => {
       await session.send("不可以涩涩哦~");
 
-      const provider = getProvider(config);
-      if (!provider) {
+      const sourceProvider = options.source ? Providers[options.source] : getProvider(config);
+      if (!sourceProvider) {
         return h('', [
           h('at', { id: session.userId }),
-          h('text', { content: ' 未选择有效的图片来源，请检查配置' })
+          h('text', { content: ' 未选择有效的图片来源，请检查配置或命令参数' })
         ]);
       }
 
-      provider.getInstance().config = config;
+      const provider = sourceProvider.getInstance();
+      provider.setConfig(config);
 
       const messages: h[] = [];
       const pool = new ParallelPool<void>(config.maxConcurrency);
