@@ -7,12 +7,14 @@ import { getProvider, Providers } from "./main/providers";
 
 export function apply(ctx: Context, config: Config) {
   ctx
-    .command("来张色图 [tag:text]", "随机一张色图")
+    .command("pixluna [tag:text]", "来张色图")
+    .alias("色图")
+
     .option("n", "-n <value:number>", {
       fallback: 1,
     })
     .option("source", "-s <source:string>", { fallback: '' })
-    .alias("色图")
+
     .action(async ({ session, options }, tag) => {
       await session.send("不可以涩涩哦~");
 

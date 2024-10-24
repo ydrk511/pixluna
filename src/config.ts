@@ -77,6 +77,6 @@ export const Config: Schema<Config> = Schema.intersect([
   }).description('图源设置'),
 ]);
 
-export const name = "pixiv";
+export const name = "pixluna";
 
 export default Config;
