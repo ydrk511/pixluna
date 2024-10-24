@@ -19,13 +19,6 @@ export interface Pixivic {
   createDate: string; // 作品创建时间
 }
 
-export interface Vilipix {
-  original_url: string;
-  title: string;
-  tags: string;
-  picture_id: string;
-}
-
 export interface Lolicon {
   pid: number;
   p: number;
@@ -34,7 +27,7 @@ export interface Lolicon {
   author: string;
   r18: false;
   tags: string[];
-  ext: number;
+  ext: string;
   aiType: number;
   uploadDate: number;
   urls: {
@@ -54,8 +47,33 @@ export interface ImageMetaData {
   url: string;
   urls: {
     regular?: string;
-  },
-  raw: Lolicon
+    original?: string;
+  };
+  raw: GeneralImageData;
+}
+
+export interface GeneralImageData {
+  id: number | string;
+  title: string;
+  author: string;
+  r18: boolean;
+  tags: string[];
+  extension: string;
+  aiType: number;
+  uploadDate: number;
+  urls: {
+    regular?: string;
+    original: string;
+  };
+}
+
+export interface PixivImageData extends GeneralImageData {
+  userId: string;
+  width: number;
+  height: number;
+  pageCount: number;
+  xRestrict: number;
+  createDate: string;
 }
 
 export interface CommonSourceRequest {
@@ -96,5 +114,5 @@ export abstract class SourceProvider {
   abstract config: any;
   abstract getMetaData(ctx: {context: Context}, props: CommonSourceRequest):
     Promise<SourceResponse<ImageMetaData>>;
+  abstract setConfig(config: any): void;
 }
-

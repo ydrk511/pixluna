@@ -11,7 +11,7 @@ export interface Config {
   maxConcurrency: number;
   forwardMessage: boolean;
   compress: boolean;
-  defaultSourceProvider: 'none' | 'lolicon' | 'lolisuki';
+  defaultSourceProvider: 'none' | 'lolicon' | 'lolisuki' | 'pixiv';
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -74,6 +74,7 @@ export const Config: Schema<Config> = Schema.intersect([
       Schema.const('none').description('无'),
       Schema.const('lolicon').description('Lolicon API'),
       Schema.const('lolisuki').description('Lolisuki API'),
+      Schema.const('pixiv').description('Pixiv Discovery'),
     ]).description('选择默认图片来源').default('lolicon'),
   }).description('图源设置'),
 ]);

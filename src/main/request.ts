@@ -1,17 +1,15 @@
 import { Context, h } from "koishi";
 import Config from "../config";
-import { Lolicon, SourceProvider } from "../utils/type";
+import { GeneralImageData, ImageMetaData, SourceProvider } from "../utils/type";
 import { getImageMimeType } from "../utils/getImageMimeType";
 import { taskTime } from "../utils/data";
 import { qualityImage, mixImage } from "../utils/imageProcessing";
 import { fetchImageBuffer } from "../utils/imageFetcher";
 import { getProvider } from "./providers";
 
-const RANDOM_IMAGE_URL = "https://api.lolicon.app/setu/v2";
-
-export async function getRemoteImage(ctx: Context, tag: string, config: Config): Promise<Lolicon & {
+export async function getRemoteImage(ctx: Context, tag: string, config: Config): Promise<GeneralImageData & {
   data: string | h;
-  raw: Lolicon;
+  raw: GeneralImageData;
 }> {
   const provider = getProvider(config);
   if (!provider) {
@@ -29,8 +27,7 @@ export async function getRemoteImage(ctx: Context, tag: string, config: Config):
     );
   }
 
-  const params = {
-    size: ["original", "regular"],
+  const commonParams = {
     r18: config.isR18 ? (Math.random() < config.r18P ? 1 : 0) : 0,
     excludeAI: config.excludeAI,
     tag: tag ? tag.split(" ").join("|") : void 0,
@@ -38,9 +35,11 @@ export async function getRemoteImage(ctx: Context, tag: string, config: Config):
   };
 
   const srcProvider = provider.getInstance();
+  srcProvider.setConfig(config);
+
   const metadata = await srcProvider.getMetaData({
     context: ctx,
-  }, params);
+  }, commonParams);
 
   if (metadata.status === "error") {
     return null;

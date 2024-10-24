@@ -1,9 +1,9 @@
 import { Context, h } from "koishi";
 import Config from "../config";
 import { getRemoteImage } from "./request";
-import { Lolicon } from "../utils/type";
+import { GeneralImageData } from "../utils/type";
 
-function renderImageMessage(image: Lolicon & { data: string | h }): h {
+function renderImageMessage(image: GeneralImageData & { data: string | h }): h {
   const data = typeof image.data === "string"
     ? h("image", { url: image.data })
     : image.data;
@@ -11,7 +11,7 @@ function renderImageMessage(image: Lolicon & { data: string | h }): h {
   return h("message", [
     data,
     h("text", { content: `\ntitle：${image.title}\n` }),
-    h("text", { content: `id：${image.pid}\n` }),
+    h("text", { content: `id：${image.id}\n` }),
     h("text", {
       content: `tags：${image.tags.map((item: string) => "#" + item).join(" ")}\n`,
     }),
