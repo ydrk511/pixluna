@@ -36,9 +36,7 @@ export function apply(ctx: Context, config: Config) {
         id = await taskTime(ctx, "send message", () => {
           if (config.forwardMessage) {
             return session.send(
-              <>
-                <message forward={config.forwardMessage}>{messages}</message>
-              </>,
+              h('message', { forward: config.forwardMessage }, messages)
             );
           }
 
@@ -51,12 +49,10 @@ export function apply(ctx: Context, config: Config) {
       if (id === undefined || id.length === 0) {
         ctx.logger.error(`消息发送失败，账号可能被风控`);
 
-        return (
-          <>
-            <at id={session.userId}></at>
-            <text content={" 消息发送失败了喵，账号可能被风控\n"}></text>
-          </>
-        );
+        return h('', [
+          h('at', { id: session.userId }),
+          h('text', { content: ' 消息发送失败了喵，账号可能被风控\n' })
+        ]);
       }
     });
 }
