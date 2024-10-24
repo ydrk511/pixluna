@@ -58,6 +58,6 @@ pixluna -n 5 黑丝
 
 ## 贡献者名单
 
-<a href="https://github.com/Hoshino-Yumetsuki/pixluna/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Hoshino-Yumetsuki/pixluna" />
+<a href="https://github.com/PixLunaLab/pixluna/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=PixLunaLab/pixluna" />
 </a>
