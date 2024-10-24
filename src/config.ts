@@ -11,7 +11,7 @@ export interface Config {
   maxConcurrency: number;
   forwardMessage: boolean;
   compress: boolean;
-  defaultSourceProvider: 'none' | 'lolicon';
+  defaultSourceProvider: 'none' | 'lolicon' | 'lolisuki';
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -71,8 +71,9 @@ export const Config: Schema<Config> = Schema.intersect([
   // 图源设置
   Schema.object({
     defaultSourceProvider: Schema.union([
-      Schema.const('none').description('无（占位选项）'),
+      Schema.const('none').description('无'),
       Schema.const('lolicon').description('Lolicon API'),
+      Schema.const('lolisuki').description('Lolisuki API'),
     ]).description('选择默认图片来源').default('lolicon'),
   }).description('图源设置'),
 ]);
