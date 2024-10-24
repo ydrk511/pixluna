@@ -1,7 +1,6 @@
 import { Context, h } from "koishi";
 import Config from "../config";
 import { getRemoteImage } from "./request";
-import { provider } from "./providers"; // 直接引入锁定的 provider
 import { Lolicon } from "../utils/type";
 
 function renderImageMessage(image: Lolicon & { data: string | h }): h {
@@ -21,7 +20,7 @@ function renderImageMessage(image: Lolicon & { data: string | h }): h {
 
 export async function render(ctx: Context, config: Config, tag: string) {
   try {
-    const image = await getRemoteImage(ctx, tag, config, provider); // 直接使用锁定的 provider
+    const image = await getRemoteImage(ctx, tag, config);
 
     if (!image) {
       return h("message", [h("text", { content: "没有获取到喵\n" })]);
