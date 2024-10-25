@@ -25,7 +25,7 @@ export async function getRemoteImage(
     let sharp
     try {
         sharp = (await import('sharp'))?.default
-    } catch {}
+    } catch { }
 
     if ((config.imageConfusion || config.compress) && !sharp) {
         ctx.logger.warn(
@@ -34,7 +34,7 @@ export async function getRemoteImage(
     }
 
     const commonParams = {
-        r18: config.isR18 ? (Math.random() < config.r18P ? 1 : 0) : 0,
+        r18: config.isR18 && Math.random() < config.r18P,
         excludeAI: config.excludeAI,
         tag: tag ? tag.split(' ').join('|') : void 0,
         proxy: config.baseUrl ? config.baseUrl : void 0

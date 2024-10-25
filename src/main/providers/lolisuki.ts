@@ -56,7 +56,7 @@ export class LolisukiSourceProvider extends SourceProvider {
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
         const requestParams: LolisukiSourceRequest = {
-            r18: props.r18 ? 1 : 0,
+            r18: props.r18 ? 1 : 0,  // 将 boolean 转换为 0 或 1
             num: 1,
             size: props.size,
             keyword: props.tag,

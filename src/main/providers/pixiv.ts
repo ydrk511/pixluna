@@ -35,6 +35,7 @@ export interface PixivSourceRequest {
 
 export class PixivSourceProvider extends SourceProvider {
     static DISCOVERY_URL = 'https://www.pixiv.net/ajax/illust/discovery'
+    static ILLUST_PAGES_URL = 'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
 
     private _config: Config
 
@@ -50,14 +51,14 @@ export class PixivSourceProvider extends SourceProvider {
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
         const requestParams: PixivSourceRequest = {
-            mode: 'all',
+            mode: props.r18 ? 'r18' : 'all',  // 根据 boolean 值设置 mode
             limit: 1
         }
 
         const url = `${PixivSourceProvider.DISCOVERY_URL}?mode=${requestParams.mode}&limit=${requestParams.limit}`
 
         try {
-            const res = await context.http.get<PixivResponse>(url, {
+            const discoveryRes = await context.http.get<PixivResponse>(url, {
                 headers: {
                     Referer: 'https://www.pixiv.net/',
                     'User-Agent':
@@ -68,21 +69,39 @@ export class PixivSourceProvider extends SourceProvider {
                     : undefined
             })
 
-            if (res.error || !res.body.illusts.length) {
+            if (discoveryRes.error || !discoveryRes.body.illusts.length) {
                 return {
                     status: 'error',
-                    data: new Error(res.message || '未找到插画')
+                    data: new Error(discoveryRes.message || '未找到插画')
                 }
             }
 
-            // 随机选择一个插画
-            const illust =
-                res.body.illusts[
-                    Math.floor(Math.random() * res.body.illusts.length)
-                ]
+            const illust = discoveryRes.body.illusts[0]
 
-            // 构建图片URL，使用配置的baseUrl
-            const imageUrl = `https://${this.config.baseUrl}/img-original/img/${illust.createDate.slice(0, 10).replace(/-/g, '/')}/${illust.id}_p0.jpg`
+            const illustPagesUrl = PixivSourceProvider.ILLUST_PAGES_URL.replace('{ARTWORK_ID}', illust.id)
+            const illustPagesRes = await context.http.get(illustPagesUrl, {
+                headers: {
+                    Referer: 'https://www.pixiv.net/',
+                    'User-Agent':
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                },
+                proxyAgent: this.config.isProxy
+                    ? this.config.proxyHost
+                    : undefined
+            })
+
+            if (illustPagesRes.error || !illustPagesRes.body.length) {
+                return {
+                    status: 'error',
+                    data: new Error('无法获取原图链接')
+                }
+            }
+
+            const originalUrl = illustPagesRes.body[0].urls.original
+
+            // 使用 base URL 构造图片链接
+            const baseUrl = this.config.baseUrl || 'i.pximg.net'
+            const constructedUrl = originalUrl.replace('i.pximg.net', baseUrl)
 
             const generalImageData: GeneralImageData = {
                 id: parseInt(illust.id),
@@ -90,22 +109,22 @@ export class PixivSourceProvider extends SourceProvider {
                 author: illust.userName,
                 r18: illust.xRestrict > 0,
                 tags: illust.tags,
-                extension: 'jpg',
-                aiType: 0, // Pixiv API 不提供 AI 类型信息，默认为 0
+                extension: originalUrl.split('.').pop(),
+                aiType: 0,
                 uploadDate: new Date(illust.createDate).getTime(),
                 urls: {
-                    original: imageUrl,
-                    regular: illust.url
+                    original: constructedUrl,
+                    regular: illust.url.replace('i.pximg.net', baseUrl)
                 }
             }
 
             return {
                 status: 'success',
                 data: {
-                    url: imageUrl,
+                    url: constructedUrl,
                     urls: {
-                        regular: illust.url,
-                        original: imageUrl
+                        regular: illust.url.replace('i.pximg.net', baseUrl),
+                        original: constructedUrl
                     },
                     raw: generalImageData
                 }

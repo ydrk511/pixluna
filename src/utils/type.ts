@@ -29,7 +29,7 @@ export interface GeneralImageData {
 export interface CommonSourceRequest {
   tag?: string;
   size?: string[];
-  r18?: number;
+  r18?: boolean;
   excludeAI?: boolean;
   proxy?: string;
 }
