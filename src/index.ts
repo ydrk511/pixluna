@@ -15,6 +15,7 @@ export function apply(ctx: Context, config: Config) {
         .action(async ({ session, options }, tag) => {
             await session.send('不可以涩涩哦~')
 
+            // 修改这里,优先使用命令行参数
             const sourceProvider = options.source
                 ? Providers[options.source]
                 : getProvider(config)
@@ -28,7 +29,15 @@ export function apply(ctx: Context, config: Config) {
             }
 
             const provider = sourceProvider.getInstance()
-            provider.setConfig(config)
+
+            // 创建一个新的配置对象,合并命令行参数和默认配置
+            const mergedConfig = {
+                ...config,
+                defaultSourceProvider: options.source || config.defaultSourceProvider,
+                // 可以在这里添加其他需要从命令行参数覆盖的配置项
+            }
+
+            provider.setConfig(mergedConfig)
 
             const messages: h[] = []
             const pool = new ParallelPool<void>(config.maxConcurrency)
