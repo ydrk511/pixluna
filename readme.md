@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./Image_1727599920514.png">
+<img src="./images/Image_1727599920514.png">
 
 <i>多图源整合式涩图插件！（正在开发中）</i>
 
