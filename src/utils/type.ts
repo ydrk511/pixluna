@@ -1,46 +1,5 @@
 import type { Context } from "koishi";
 
-export interface Pixivic {
-  id: number; // 作品id
-  title: string; // 作品标题
-
-  imageUrls: {
-    large: string; // 大图
-    medium: string; // 中图
-    original: string; // 原图
-    squareMedium: string; // 小图
-  }[];
-
-  tags: {
-    name: string; // 标签名
-    translatedName: string; // 标签翻译
-  }[];
-
-  createDate: string; // 作品创建时间
-}
-
-export interface Lolicon {
-  pid: number;
-  p: number;
-  uid: number;
-  title: string;
-  author: string;
-  r18: false;
-  tags: string[];
-  ext: string;
-  aiType: number;
-  uploadDate: number;
-  urls: {
-    regular: string; // 中图
-    original: string; // 原图
-  };
-}
-
-export interface LoliconRequest {
-  error?: string;
-  data: Lolicon[];
-}
-
 export type ImageMimeType = "jpg" | "jpeg" | "png" | "gif";
 
 export interface ImageMetaData {
@@ -65,15 +24,6 @@ export interface GeneralImageData {
     regular?: string;
     original: string;
   };
-}
-
-export interface PixivImageData extends GeneralImageData {
-  userId: string;
-  width: number;
-  height: number;
-  pageCount: number;
-  xRestrict: number;
-  createDate: string;
 }
 
 export interface CommonSourceRequest {
