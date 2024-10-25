@@ -1,22 +1,13 @@
 {
   "name": "koishi-plugin-pixluna",
   "description": "比较新的涩图插件（？",
-  "version": "2.1.0-beta.1",
-  "main": "lib/index.cjs",
-  "module": "lib/index.mjs",
-  "exports": {
-    ".": {
-      "import": "./lib/index.mjs",
-      "types": "./lib/index.d.ts",
-      "require": "./lib/index.cjs"
-    },
-    "./package.json": "./package.json"
-  },
+  "version": "2.1.0-beta.2",
+  "main": "dist/index.js",
   "files": [
-    "lib"
+    "dist"
   ],
-  "type": "module",
   "scripts": {
+    "build": "node esbuild.config.mjs",
     "lint": "eslint",
     "lint-fix": "eslint --fix"
   },
