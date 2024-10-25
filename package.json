@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-pixluna",
   "description": "比较新的涩图插件（？",
-  "version": "2.0.7",
+  "version": "2.1.0-beta.1",
   "main": "lib/index.cjs",
   "module": "lib/index.mjs",
   "exports": {
@@ -12,6 +12,9 @@
     },
     "./package.json": "./package.json"
   },
+  "files": [
+    "lib"
+  ],
   "type": "module",
   "scripts": {
     "lint": "eslint",
