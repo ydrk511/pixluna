@@ -62,7 +62,7 @@ export abstract class SourceProvider {
   }
 
   abstract config: any;
-  abstract getMetaData(ctx: {context: Context}, props: CommonSourceRequest):
+  abstract getMetaData(ctx: { context: Context }, props: CommonSourceRequest):
     Promise<SourceResponse<ImageMetaData>>;
   abstract setConfig(config: any): void;
 }
