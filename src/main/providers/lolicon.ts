@@ -56,7 +56,7 @@ export class LoliconSourceProvider extends SourceProvider {
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
         const requestParams: LoliconSourceRequest = {
-            r18: props.r18,
+            r18: props.r18 ? 1 : 0,
             num: 1,
             size: props.size,
             keyword: props.tag,
