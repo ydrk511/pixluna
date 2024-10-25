@@ -15,5 +15,10 @@ export const Providers: {
 }
 
 export function getProvider(config: Config): typeof SourceProvider {
-    return Providers[config.defaultSourceProvider]
+    const Provider = Providers[config.defaultSourceProvider]
+    if (Provider) {
+        const instance = Provider.getInstance()
+        instance.setConfig(config)
+    }
+    return Provider
 }

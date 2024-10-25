@@ -57,13 +57,19 @@ export class PixivSourceProvider extends SourceProvider {
 
         const url = `${PixivSourceProvider.DISCOVERY_URL}?mode=${requestParams.mode}&limit=${requestParams.limit}`
 
+        const headers = {
+            Referer: 'https://www.pixiv.net/',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+
+        // 如果配置了 PHPSESSID，则添加到 Cookie 中
+        if (this.config.pixivPHPSESSID) {
+            headers['Cookie'] = `PHPSESSID=${this.config.pixivPHPSESSID}`
+        }
+
         try {
             const discoveryRes = await context.http.get<PixivResponse>(url, {
-                headers: {
-                    Referer: 'https://www.pixiv.net/',
-                    'User-Agent':
-                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-                },
+                headers,
                 proxyAgent: this.config.isProxy
                     ? this.config.proxyHost
                     : undefined

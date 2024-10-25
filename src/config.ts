@@ -12,6 +12,7 @@ export interface Config {
     forwardMessage: boolean
     compress: boolean
     defaultSourceProvider: 'none' | 'lolicon' | 'lolisuki' | 'pixiv'
+    pixivPHPSESSID?: string
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -79,7 +80,14 @@ export const Config: Schema<Config> = Schema.intersect([
         ])
             .description('选择默认图片来源')
             .default('lolicon')
-    }).description('图源设置')
+    }).description('图源设置'),
+
+    // Pixiv 设置
+    Schema.object({
+        pixivPHPSESSID: Schema.string()
+            .description('Pixiv 的 PHPSESSID，用于访问个性化内容。返回的图片分级取决于该 Pixiv 账号所有者的分级设置。')
+            .default('')
+    }).description('Pixiv 设置')
 ])
 
 export const name = 'pixluna'
