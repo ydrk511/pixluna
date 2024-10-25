@@ -1,6 +1,6 @@
 import { Context, h } from 'koishi'
 import Config from '../config'
-import { GeneralImageData, ImageMetaData, SourceProvider } from '../utils/type'
+import { GeneralImageData } from '../utils/type'
 import { getImageMimeType } from '../utils/getImageMimeType'
 import { taskTime } from '../utils/data'
 import { qualityImage, mixImage } from '../utils/imageProcessing'
