@@ -75,8 +75,6 @@ export function apply(ctx: Context, config: Config) {
             }
         })
 
-    // 添加子命令来显示可用的图片来源
-    ctx.command('pixluna [tag:text]', '来张色图')
         .subcommand('.source', '显示可用的图片来源')
         .action(async ({ session }) => {
             const availableSources = Object.keys(Providers)
