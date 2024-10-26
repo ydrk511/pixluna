@@ -107,7 +107,6 @@ export const Config: Schema<Config> = Schema.intersect([
                     .description('获取关注列表的数量限制')
                     .default(10)
                     .min(1)
-                    .max(100)
             }).description('Pixiv Following 设置')
         }).description('Pixiv 设置')
     }),
