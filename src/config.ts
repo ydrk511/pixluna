@@ -11,12 +11,16 @@ export interface Config {
     maxConcurrency: number
     forwardMessage: boolean
     compress: boolean
-    defaultSourceProvider: 'none' | 'lolicon' | 'lolisuki' | 'pixiv'
-    pixivPHPSESSID?: string
+    defaultSourceProvider: 'none' | 'lolicon' | 'lolisuki' | 'pixiv-discovery' | 'pixiv-following'
     isLog: boolean
-    pixivFollowingUserId: string
-    pixivFollowingOffset: number
-    pixivFollowingLimit: number
+    pixiv: {
+        phpSESSID: string
+        following: {
+            userId: string
+            offset: number
+            limit: number
+        }
+    }
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -47,9 +51,7 @@ export const Config: Schema<Config> = Schema.intersect([
 
         compress: Schema.boolean()
             .default(false)
-            .description(
-                '是否压缩图片（能大幅度提升发送的速度，但是对图片质量有影响）'
-            )
+            .description('是否压缩图片（能大幅度提升发送的速度，但是对图片质量有影响）')
     }).description('通用设置'),
 
     // R18 内容设置
@@ -80,7 +82,8 @@ export const Config: Schema<Config> = Schema.intersect([
             Schema.const('none').description('无'),
             Schema.const('lolicon').description('Lolicon API'),
             Schema.const('lolisuki').description('Lolisuki API'),
-            Schema.const('pixiv').description('Pixiv Discovery')
+            Schema.const('pixiv-discovery').description('Pixiv Discovery'),
+            Schema.const('pixiv-following').description('Pixiv Following')
         ])
             .description('选择默认图片来源')
             .default('lolicon')
@@ -88,28 +91,26 @@ export const Config: Schema<Config> = Schema.intersect([
 
     // Pixiv 设置
     Schema.object({
-        pixivPHPSESSID: Schema.string()
-            .description(
-                'Pixiv 的 PHPSESSID，用于访问个性化内容。返回的图片分级取决于该 Pixiv 账号所有者的分级设置。'
-            )
-            .default('')
-    }).description('Pixiv 设置'),
-
-    // Pixiv Following 设置
-    Schema.object({
-        pixivFollowingUserId: Schema.string()
-            .description('Pixiv 用户 ID,用于获取关注列表')
-            .default(''),
-        pixivFollowingOffset: Schema.number()
-            .description('关注列表的偏移量')
-            .default(0)
-            .min(0),
-        pixivFollowingLimit: Schema.number()
-            .description('获取关注列表的数量限制')
-            .default(10)
-            .min(1)
-            .max(100)
-    }).description('Pixiv Following 设置'),
+        pixiv: Schema.object({
+            phpSESSID: Schema.string()
+                .description('Pixiv 的 PHPSESSID，用于访问个性化内容。返回的图片分级取决于该 Pixiv 账号所有者的分级设置。')
+                .default(''),
+            following: Schema.object({
+                userId: Schema.string()
+                    .description('Pixiv 用户 ID，用于获取关注列表')
+                    .default(''),
+                offset: Schema.number()
+                    .description('关注列表的偏移量')
+                    .default(0)
+                    .min(0),
+                limit: Schema.number()
+                    .description('获取关注列表的数量限制')
+                    .default(10)
+                    .min(1)
+                    .max(100)
+            }).description('Pixiv Following 设置')
+        }).description('Pixiv 设置')
+    }),
 
     Schema.object({
         isLog: Schema.boolean().default(false).description('是否输出debug日志')

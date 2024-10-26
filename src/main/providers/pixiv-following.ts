@@ -7,6 +7,7 @@ import type {
     SourceResponse
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
+import { shuffleArray } from '../../utils/shuffle'
 
 interface PixivFollowingResponse {
     error: boolean
@@ -49,8 +50,10 @@ export interface PixivFollowingSourceRequest {
 }
 
 export class PixivFollowingSourceProvider extends SourceProvider {
-    static FOLLOWING_URL = 'https://www.pixiv.net/ajax/user/{USER_ID}/following?offset={OFFSET_COUNT}&limit={LIMIT_COUNT}&rest=show'
-    static ILLUST_PAGES_URL = 'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
+    static FOLLOWING_URL =
+        'https://www.pixiv.net/ajax/user/{USER_ID}/following?offset={OFFSET_COUNT}&limit={LIMIT_COUNT}&rest=show'
+    static ILLUST_PAGES_URL =
+        'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
 
     private _config: Config
 
@@ -61,10 +64,12 @@ export class PixivFollowingSourceProvider extends SourceProvider {
         return this._config
     }
 
-    async getMetaData(
-        { context }: { context: Context },
-    ): Promise<SourceResponse<ImageMetaData>> {
-        if (!this.config.pixivPHPSESSID) {
+    async getMetaData({
+        context
+    }: {
+        context: Context
+    }): Promise<SourceResponse<ImageMetaData>> {
+        if (!this.config.pixiv.phpSESSID) {
             return {
                 status: 'error',
                 data: new Error('未设置 Pixiv PHPSESSID')
@@ -72,27 +77,35 @@ export class PixivFollowingSourceProvider extends SourceProvider {
         }
 
         const requestParams: PixivFollowingSourceRequest = {
-            userId: this.config.pixivFollowingUserId,
-            offset: this.config.pixivFollowingOffset,
-            limit: this.config.pixivFollowingLimit
+            userId: this.config.pixiv.following.userId,
+            offset: this.config.pixiv.following.offset,
+            limit: this.config.pixiv.following.limit
         }
 
-        const url = PixivFollowingSourceProvider.FOLLOWING_URL
-            .replace('{USER_ID}', requestParams.userId)
+        const url = PixivFollowingSourceProvider.FOLLOWING_URL.replace(
+            '{USER_ID}',
+            requestParams.userId
+        )
             .replace('{OFFSET_COUNT}', requestParams.offset.toString())
             .replace('{LIMIT_COUNT}', requestParams.limit.toString())
 
         const headers = {
             Referer: 'https://www.pixiv.net/',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            Cookie: `PHPSESSID=${this.config.pixivPHPSESSID}`
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            Cookie: `PHPSESSID=${this.config.pixiv.phpSESSID}`
         }
 
         try {
-            const followingRes = await context.http.get<PixivFollowingResponse>(url, {
-                headers,
-                proxyAgent: this.config.isProxy ? this.config.proxyHost : undefined
-            })
+            const followingRes = await context.http.get<PixivFollowingResponse>(
+                url,
+                {
+                    headers,
+                    proxyAgent: this.config.isProxy
+                        ? this.config.proxyHost
+                        : undefined
+                }
+            )
 
             if (followingRes.error || !followingRes.body.users.length) {
                 return {
@@ -102,8 +115,10 @@ export class PixivFollowingSourceProvider extends SourceProvider {
             }
 
             // 从所有关注用户的插画中随机选择一张
-            const allIllusts = followingRes.body.users.flatMap(user => user.illusts)
-            const selectedIllust = this.shuffleArray(allIllusts)[0]
+            const allIllusts = followingRes.body.users.flatMap(
+                (user) => user.illusts
+            )
+            const selectedIllust = shuffleArray(allIllusts)[0]
 
             if (!selectedIllust) {
                 return {
@@ -112,14 +127,21 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 }
             }
 
-            const illustPagesUrl = PixivFollowingSourceProvider.ILLUST_PAGES_URL.replace(
-                '{ARTWORK_ID}',
-                selectedIllust.id
-            )
-            const illustPagesRes = await context.http.get<PixivIllustPagesResponse>(illustPagesUrl, {
-                headers,
-                proxyAgent: this.config.isProxy ? this.config.proxyHost : undefined
-            })
+            const illustPagesUrl =
+                PixivFollowingSourceProvider.ILLUST_PAGES_URL.replace(
+                    '{ARTWORK_ID}',
+                    selectedIllust.id
+                )
+            const illustPagesRes =
+                await context.http.get<PixivIllustPagesResponse>(
+                    illustPagesUrl,
+                    {
+                        headers,
+                        proxyAgent: this.config.isProxy
+                            ? this.config.proxyHost
+                            : undefined
+                    }
+                )
 
             if (illustPagesRes.error || !illustPagesRes.body.length) {
                 return {
@@ -154,7 +176,10 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 data: {
                     url: constructedUrl,
                     urls: {
-                        regular: selectedIllust.url.replace('i.pximg.net', baseUrl),
+                        regular: selectedIllust.url.replace(
+                            'i.pximg.net',
+                            baseUrl
+                        ),
                         original: constructedUrl
                     },
                     raw: generalImageData
@@ -166,15 +191,6 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 data: error
             }
         }
-    }
-
-    private shuffleArray<T>(array: T[]): T[] {
-        const shuffled = [...array]
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1))
-            ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-        }
-        return shuffled
     }
 
     setConfig(config: Config) {

@@ -7,6 +7,7 @@ import type {
     SourceResponse
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
+import { shuffleArray } from '../../utils/shuffle'
 
 interface PixivResponse {
     error: boolean
@@ -28,12 +29,12 @@ interface PixivResponse {
     }
 }
 
-export interface PixivSourceRequest {
+export interface PixivDiscoverySourceRequest {
     mode: string
     limit: number
 }
 
-export class PixivSourceProvider extends SourceProvider {
+export class PixivDiscoverySourceProvider extends SourceProvider {
     static DISCOVERY_URL = 'https://www.pixiv.net/ajax/illust/discovery'
     static ILLUST_PAGES_URL =
         'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
@@ -51,12 +52,12 @@ export class PixivSourceProvider extends SourceProvider {
         { context }: { context: Context },
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
-        const requestParams: PixivSourceRequest = {
+        const requestParams: PixivDiscoverySourceRequest = {
             mode: props.r18 ? 'r18' : 'all',
             limit: 8 // 修改为获取8张图片
         }
 
-        const url = `${PixivSourceProvider.DISCOVERY_URL}?mode=${requestParams.mode}&limit=${requestParams.limit}`
+        const url = `${PixivDiscoverySourceProvider.DISCOVERY_URL}?mode=${requestParams.mode}&limit=${requestParams.limit}`
 
         const headers = {
             Referer: 'https://www.pixiv.net/',
@@ -65,8 +66,8 @@ export class PixivSourceProvider extends SourceProvider {
         }
 
         // 如果配置了 PHPSESSID，则添加到 Cookie 中
-        if (this.config.pixivPHPSESSID) {
-            headers['Cookie'] = `PHPSESSID=${this.config.pixivPHPSESSID}`
+        if (this.config.pixiv.phpSESSID) {
+            headers['Cookie'] = `PHPSESSID=${this.config.pixiv.phpSESSID}`
         }
 
         try {
@@ -84,11 +85,11 @@ export class PixivSourceProvider extends SourceProvider {
                 }
             }
 
-            // 使用洗牌算法随机选择一张图片
-            const shuffledIllusts = this.shuffleArray(discoveryRes.body.illusts)
+            // 使用导入的 shuffleArray 函数
+            const shuffledIllusts = shuffleArray(discoveryRes.body.illusts)
             const selectedIllust = shuffledIllusts[0]
 
-            const illustPagesUrl = PixivSourceProvider.ILLUST_PAGES_URL.replace(
+            const illustPagesUrl = PixivDiscoverySourceProvider.ILLUST_PAGES_URL.replace(
                 '{ARTWORK_ID}',
                 selectedIllust.id
             )
@@ -151,16 +152,6 @@ export class PixivSourceProvider extends SourceProvider {
                 data: error
             }
         }
-    }
-
-    // 添加洗牌算法方法
-    private shuffleArray<T>(array: T[]): T[] {
-        const shuffled = [...array]
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1))
-            ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-        }
-        return shuffled
     }
 
     setConfig(config: Config) {
