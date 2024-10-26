@@ -35,7 +35,8 @@ export interface PixivSourceRequest {
 
 export class PixivSourceProvider extends SourceProvider {
     static DISCOVERY_URL = 'https://www.pixiv.net/ajax/illust/discovery'
-    static ILLUST_PAGES_URL = 'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
+    static ILLUST_PAGES_URL =
+        'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
 
     private _config: Config
 
@@ -52,14 +53,15 @@ export class PixivSourceProvider extends SourceProvider {
     ): Promise<SourceResponse<ImageMetaData>> {
         const requestParams: PixivSourceRequest = {
             mode: props.r18 ? 'r18' : 'all',
-            limit: 8  // 修改为获取8张图片
+            limit: 8 // 修改为获取8张图片
         }
 
         const url = `${PixivSourceProvider.DISCOVERY_URL}?mode=${requestParams.mode}&limit=${requestParams.limit}`
 
         const headers = {
             Referer: 'https://www.pixiv.net/',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
 
         // 如果配置了 PHPSESSID，则添加到 Cookie 中
@@ -86,7 +88,10 @@ export class PixivSourceProvider extends SourceProvider {
             const shuffledIllusts = this.shuffleArray(discoveryRes.body.illusts)
             const selectedIllust = shuffledIllusts[0]
 
-            const illustPagesUrl = PixivSourceProvider.ILLUST_PAGES_URL.replace('{ARTWORK_ID}', selectedIllust.id)
+            const illustPagesUrl = PixivSourceProvider.ILLUST_PAGES_URL.replace(
+                '{ARTWORK_ID}',
+                selectedIllust.id
+            )
             const illustPagesRes = await context.http.get(illustPagesUrl, {
                 headers: {
                     Referer: 'https://www.pixiv.net/',
@@ -131,7 +136,10 @@ export class PixivSourceProvider extends SourceProvider {
                 data: {
                     url: constructedUrl,
                     urls: {
-                        regular: selectedIllust.url.replace('i.pximg.net', baseUrl),
+                        regular: selectedIllust.url.replace(
+                            'i.pximg.net',
+                            baseUrl
+                        ),
                         original: constructedUrl
                     },
                     raw: generalImageData
@@ -149,8 +157,8 @@ export class PixivSourceProvider extends SourceProvider {
     private shuffleArray<T>(array: T[]): T[] {
         const shuffled = [...array]
         for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+            const j = Math.floor(Math.random() * (i + 1))
+            ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
         }
         return shuffled
     }

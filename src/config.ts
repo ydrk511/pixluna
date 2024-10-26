@@ -86,14 +86,14 @@ export const Config: Schema<Config> = Schema.intersect([
     // Pixiv 设置
     Schema.object({
         pixivPHPSESSID: Schema.string()
-            .description('Pixiv 的 PHPSESSID，用于访问个性化内容。返回的图片分级取决于该 Pixiv 账号所有者的分级设置。')
+            .description(
+                'Pixiv 的 PHPSESSID，用于访问个性化内容。返回的图片分级取决于该 Pixiv 账号所有者的分级设置。'
+            )
             .default('')
     }).description('Pixiv 设置'),
 
     Schema.object({
-        isLog: Schema.boolean()
-            .default(false)
-            .description('是否输出debug日志')
+        isLog: Schema.boolean().default(false).description('是否输出debug日志')
     }).description('日志设置')
 ])
 

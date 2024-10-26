@@ -1,68 +1,76 @@
-import type { Context } from "koishi";
+import type { Context } from 'koishi'
 
-export type ImageMimeType = "jpg" | "jpeg" | "png" | "gif";
+export type ImageMimeType = 'jpg' | 'jpeg' | 'png' | 'gif'
 
 export interface ImageMetaData {
-  url: string;
-  urls: {
-    regular?: string;
-    original?: string;
-  };
-  raw: GeneralImageData;
+    url: string
+    urls: {
+        regular?: string
+        original?: string
+    }
+    raw: GeneralImageData
 }
 
 export interface GeneralImageData {
-  id: number | string;
-  title: string;
-  author: string;
-  r18: boolean;
-  tags: string[];
-  extension: string;
-  aiType: number;
-  uploadDate: number;
-  urls: {
-    regular?: string;
-    original: string;
-  };
+    id: number | string
+    title: string
+    author: string
+    r18: boolean
+    tags: string[]
+    extension: string
+    aiType: number
+    uploadDate: number
+    urls: {
+        regular?: string
+        original: string
+    }
 }
 
 export interface CommonSourceRequest {
-  tag?: string;
-  size?: string[];
-  r18?: boolean;
-  excludeAI?: boolean;
-  proxy?: string;
+    tag?: string
+    size?: string[]
+    r18?: boolean
+    excludeAI?: boolean
+    proxy?: string
 }
 
 export interface CommonSourceResponse {
-  image: ArrayBuffer;
-  metaData: ImageMetaData
+    image: ArrayBuffer
+    metaData: ImageMetaData
 }
 
-export type SourceResponseStatus = "success" | "error";
-export type SourceResponse<T, U extends SourceResponseStatus = SourceResponseStatus> =
-  U extends "success" ? {
-    status: U;
-    data: T;
-  } : U extends "error" ? {
-    status: U;
-    data: Error | string | null | undefined;
-  } : {
-    status: SourceResponseStatus;
-    data: any;
-  }
+export type SourceResponseStatus = 'success' | 'error'
+export type SourceResponse<
+    T,
+    U extends SourceResponseStatus = SourceResponseStatus
+> = U extends 'success'
+    ? {
+          status: U
+          data: T
+      }
+    : U extends 'error'
+      ? {
+            status: U
+            data: Error | string | null | undefined
+        }
+      : {
+            status: SourceResponseStatus
+            data: any
+        }
 
 export abstract class SourceProvider {
-  private static instance: SourceProvider;
-  public static getInstance<U extends SourceProvider>(): U {
-    if (!this.instance) {
-      this.instance = Reflect.construct(this, []);
+    private static instance: SourceProvider
+    public static getInstance<U extends SourceProvider>(): U {
+        if (!this.instance) {
+            this.instance = Reflect.construct(this, [])
+        }
+        return this.instance as U
     }
-    return this.instance as U;
-  }
 
-  abstract config: any;
-  abstract getMetaData(ctx: { context: Context }, props: CommonSourceRequest):
-    Promise<SourceResponse<ImageMetaData>>;
-  abstract setConfig(config: any): void;
+    abstract config: any
+    abstract getMetaData(
+        ctx: { context: Context },
+        props: CommonSourceRequest
+    ): Promise<SourceResponse<ImageMetaData>>
+    abstract setConfig(config: any): void
 }

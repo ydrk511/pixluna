@@ -25,7 +25,7 @@ export async function getRemoteImage(
     let sharp
     try {
         sharp = (await import('sharp'))?.default
-    } catch { }
+    } catch {}
 
     if ((config.imageConfusion || config.compress) && !sharp) {
         ctx.logger.warn(

@@ -16,7 +16,12 @@ export function apply(ctx: Context, config: Config) {
         })
         .option('source', '-s <source:string>', { fallback: '' })
         .action(async ({ session, options }, tag) => {
-            logger.debug('Command executed with options:', options, 'and tag:', tag)
+            logger.debug(
+                'Command executed with options:',
+                options,
+                'and tag:',
+                tag
+            )
 
             await session.send('不可以涩涩哦~')
 
@@ -40,7 +45,9 @@ export function apply(ctx: Context, config: Config) {
             // 创建一个新的配置对象,合并命令行参数和默认配置
             const mergedConfig: Config = {
                 ...config,
-                defaultSourceProvider: (options.source as Config['defaultSourceProvider']) || config.defaultSourceProvider,
+                defaultSourceProvider:
+                    (options.source as Config['defaultSourceProvider']) ||
+                    config.defaultSourceProvider
                 // 可以在这里添加其他需要从命令行参数覆盖的配置项
             }
 
