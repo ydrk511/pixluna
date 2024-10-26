@@ -8,6 +8,7 @@ import type {
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
 import { shuffleArray } from '../../utils/shuffle'
+import { PixlunaLogger, createLogger } from '../../utils/logger'
 
 interface PixivFollowingResponse {
     error: boolean
@@ -55,21 +56,20 @@ export class PixivFollowingSourceProvider extends SourceProvider {
     static ILLUST_PAGES_URL =
         'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
 
-    private _config: Config
+    private logger: PixlunaLogger
 
-    get config(): Config {
-        if (!this._config) {
-            throw new Error('配置未设置。请在使用提供程序之前调用 setConfig。')
-        }
-        return this._config
+    constructor(ctx: Context, config: Config) {
+        super(ctx, config)
+        this.logger = createLogger(ctx, config)
     }
 
-    async getMetaData({
-        context
-    }: {
-        context: Context
-    }): Promise<SourceResponse<ImageMetaData>> {
+    async getMetaData(
+        { context }: { context: Context },
+        props: CommonSourceRequest
+    ): Promise<SourceResponse<ImageMetaData>> {
+        this.logger.debug('开始获取 Pixiv Following 元数据')
         if (!this.config.pixiv.phpSESSID) {
+            this.logger.error('未设置 Pixiv PHPSESSID')
             return {
                 status: 'error',
                 data: new Error('未设置 Pixiv PHPSESSID')
@@ -88,6 +88,8 @@ export class PixivFollowingSourceProvider extends SourceProvider {
         )
             .replace('{OFFSET_COUNT}', requestParams.offset.toString())
             .replace('{LIMIT_COUNT}', requestParams.limit.toString())
+
+        this.logger.debug(`请求 URL: ${url}`)
 
         const headers = {
             Referer: 'https://www.pixiv.net/',
@@ -108,24 +110,33 @@ export class PixivFollowingSourceProvider extends SourceProvider {
             )
 
             if (followingRes.error || !followingRes.body.users.length) {
+                this.logger.error(
+                    'Pixiv Following API 返回错误或无关注用户',
+                    followingRes.error
+                )
                 return {
                     status: 'error',
                     data: new Error(followingRes.message || '未找到关注的用户')
                 }
             }
 
-            // 从所有关注用户的插画中随机选择一张
+            this.logger.debug(
+                `成功获取 ${followingRes.body.users.length} 个关注用户`
+            )
             const allIllusts = followingRes.body.users.flatMap(
                 (user) => user.illusts
             )
             const selectedIllust = shuffleArray(allIllusts)[0]
 
             if (!selectedIllust) {
+                this.logger.error('未找到插画')
                 return {
                     status: 'error',
                     data: new Error('未找到插画')
                 }
             }
+
+            this.logger.debug(`随机选择插画 ID: ${selectedIllust.id}`)
 
             const illustPagesUrl =
                 PixivFollowingSourceProvider.ILLUST_PAGES_URL.replace(
@@ -171,6 +182,7 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 }
             }
 
+            this.logger.debug('成功构建图片元数据')
             return {
                 status: 'success',
                 data: {
@@ -186,6 +198,7 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 }
             }
         } catch (error) {
+            this.logger.error('获取 Pixiv Following 元数据时发生错误', error)
             return {
                 status: 'error',
                 data: error
@@ -194,6 +207,7 @@ export class PixivFollowingSourceProvider extends SourceProvider {
     }
 
     setConfig(config: Config) {
-        this._config = config
+        this.config = config
+        this.logger = createLogger(this.ctx, config)
     }
 }

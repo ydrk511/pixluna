@@ -7,6 +7,7 @@ import type {
     SourceResponse
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
+import { PixlunaLogger, createLogger } from '../../utils/logger'
 
 export interface LoliconSourceRequest {
     r18?: number
@@ -42,21 +43,20 @@ interface LoliconResponse {
 export class LoliconSourceProvider extends SourceProvider {
     static RANDOM_IMAGE_URL = 'https://api.lolicon.app/setu/v2'
 
-    private _config: Config
+    private logger: PixlunaLogger
 
-    get config(): Config {
-        if (!this._config) {
-            throw new Error('配置未设置。请在使用提供程序之前调用 setConfig。')
-        }
-        return this._config
+    constructor(ctx: Context, config: Config) {
+        super(ctx, config)
+        this.logger = createLogger(ctx, config)
     }
 
     async getMetaData(
         { context }: { context: Context },
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
+        this.logger.debug('开始获取 Lolicon 元数据')
         const requestParams: LoliconSourceRequest = {
-            r18: props.r18 ? 1 : 0, // 将 boolean 转换为 0 或 1
+            r18: props.r18 ? 1 : 0,
             num: 1,
             size: props.size,
             keyword: props.tag,
@@ -112,6 +112,7 @@ export class LoliconSourceProvider extends SourceProvider {
     }
 
     setConfig(config: Config) {
-        this._config = config
+        this.config = config
+        this.logger = createLogger(this.ctx, config)
     }
 }

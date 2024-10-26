@@ -17,7 +17,7 @@ export async function getRemoteImage(
         raw: GeneralImageData
     }
 > {
-    const provider = getProvider(config)
+    const provider = getProvider(ctx, config)
     if (!provider) {
         throw new Error('未选择有效的图片来源，请检查配置')
     }
@@ -40,10 +40,8 @@ export async function getRemoteImage(
         proxy: config.baseUrl ? config.baseUrl : void 0
     }
 
-    const srcProvider = provider.getInstance()
-    srcProvider.setConfig(config)
-
-    const metadata = await srcProvider.getMetaData(
+    // 移除了 getInstance() 调用，因为 getProvider 现在直接返回实例
+    const metadata = await provider.getMetaData(
         {
             context: ctx
         },

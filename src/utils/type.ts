@@ -1,4 +1,5 @@
 import type { Context } from 'koishi'
+import type { Config } from '../config'
 
 export type ImageMimeType = 'jpg' | 'jpeg' | 'png' | 'gif'
 
@@ -59,18 +60,12 @@ export type SourceResponse<
         }
 
 export abstract class SourceProvider {
-    private static instance: SourceProvider
-    public static getInstance<U extends SourceProvider>(): U {
-        if (!this.instance) {
-            this.instance = Reflect.construct(this, [])
-        }
-        return this.instance as U
-    }
+    protected constructor(protected ctx: Context, protected config: Config) {}
 
-    abstract config: any
     abstract getMetaData(
-        ctx: { context: Context },
+        context: { context: Context },
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>>
-    abstract setConfig(config: any): void
+
+    abstract setConfig(config: Config): void
 }
