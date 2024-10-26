@@ -3,7 +3,7 @@ import type Config from './config'
 import { ParallelPool } from './utils/data'
 import { render } from './main/renderer'
 import { taskTime } from './utils/data'
-import { getProvider, Providers } from './main/providers'
+import { getProvider, Providers, ProviderTypes } from './main/providers'
 import { createLogger } from './utils/logger'
 
 export function apply(ctx: Context, config: Config) {
@@ -25,23 +25,6 @@ export function apply(ctx: Context, config: Config) {
 
             await session.send('不可以涩涩哦~')
 
-            // 修改这里,优先使用命令行参数
-            const sourceProvider = options.source
-                ? Providers[options.source as keyof typeof Providers]
-                : getProvider(config)
-            if (!sourceProvider) {
-                return h('', [
-                    h('at', { id: session.userId }),
-                    h('text', {
-                        content: ' 未选择有效的图片来源，请检查配置或命令参数'
-                    })
-                ])
-            }
-
-            logger.debug('Source provider selected:', sourceProvider)
-
-            const provider = sourceProvider.getInstance()
-
             // 创建一个新的配置对象,合并命令行参数和默认配置
             const mergedConfig: Config = {
                 ...config,
@@ -51,7 +34,22 @@ export function apply(ctx: Context, config: Config) {
                 // 可以在这里添加其他需要从命令行参数覆盖的配置项
             }
 
-            provider.setConfig(mergedConfig)
+            // 修改这里,优先使用命令行参数
+            let provider;
+            try {
+                provider = options.source
+                    ? getProvider(ctx, { ...mergedConfig, defaultSourceProvider: options.source as ProviderTypes })
+                    : getProvider(ctx, mergedConfig)
+            } catch (error) {
+                return h('', [
+                    h('at', { id: session.userId }),
+                    h('text', {
+                        content: ` ${error.message}`
+                    })
+                ])
+            }
+
+            logger.debug('Source provider selected:', provider.constructor.name)
 
             const messages: h[] = []
             const pool = new ParallelPool<void>(config.maxConcurrency)
