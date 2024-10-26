@@ -14,6 +14,9 @@ export interface Config {
     defaultSourceProvider: 'none' | 'lolicon' | 'lolisuki' | 'pixiv'
     pixivPHPSESSID?: string
     isLog: boolean
+    pixivFollowingUserId: string
+    pixivFollowingOffset: number
+    pixivFollowingLimit: number
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -91,6 +94,22 @@ export const Config: Schema<Config> = Schema.intersect([
             )
             .default('')
     }).description('Pixiv 设置'),
+
+    // Pixiv Following 设置
+    Schema.object({
+        pixivFollowingUserId: Schema.string()
+            .description('Pixiv 用户 ID,用于获取关注列表')
+            .default(''),
+        pixivFollowingOffset: Schema.number()
+            .description('关注列表的偏移量')
+            .default(0)
+            .min(0),
+        pixivFollowingLimit: Schema.number()
+            .description('获取关注列表的数量限制')
+            .default(10)
+            .min(1)
+            .max(100)
+    }).description('Pixiv Following 设置'),
 
     Schema.object({
         isLog: Schema.boolean().default(false).description('是否输出debug日志')
