@@ -98,6 +98,8 @@ export class LolisukiSourceProvider extends SourceProvider {
             urls: imageData.urls
         }
 
+        this.logger.debug('成功获取图片元数据', JSON.stringify(generalImageData, null, 2))
+
         return {
             status: 'success',
             data: {

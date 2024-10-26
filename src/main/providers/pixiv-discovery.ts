@@ -135,7 +135,7 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
                 }
             }
 
-            this.logger.debug('成功构建图片元数据')
+            this.logger.debug('成功获取图片元数据', JSON.stringify(generalImageData, null, 2))
             return {
                 status: 'success',
                 data: {
