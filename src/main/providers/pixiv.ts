@@ -51,8 +51,8 @@ export class PixivSourceProvider extends SourceProvider {
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
         const requestParams: PixivSourceRequest = {
-            mode: props.r18 ? 'r18' : 'all',  // 根据 boolean 值设置 mode
-            limit: 1
+            mode: props.r18 ? 'r18' : 'all',
+            limit: 8  // 修改为获取8张图片
         }
 
         const url = `${PixivSourceProvider.DISCOVERY_URL}?mode=${requestParams.mode}&limit=${requestParams.limit}`
@@ -82,9 +82,11 @@ export class PixivSourceProvider extends SourceProvider {
                 }
             }
 
-            const illust = discoveryRes.body.illusts[0]
+            // 使用洗牌算法随机选择一张图片
+            const shuffledIllusts = this.shuffleArray(discoveryRes.body.illusts)
+            const selectedIllust = shuffledIllusts[0]
 
-            const illustPagesUrl = PixivSourceProvider.ILLUST_PAGES_URL.replace('{ARTWORK_ID}', illust.id)
+            const illustPagesUrl = PixivSourceProvider.ILLUST_PAGES_URL.replace('{ARTWORK_ID}', selectedIllust.id)
             const illustPagesRes = await context.http.get(illustPagesUrl, {
                 headers: {
                     Referer: 'https://www.pixiv.net/',
@@ -110,17 +112,17 @@ export class PixivSourceProvider extends SourceProvider {
             const constructedUrl = originalUrl.replace('i.pximg.net', baseUrl)
 
             const generalImageData: GeneralImageData = {
-                id: parseInt(illust.id),
-                title: illust.title,
-                author: illust.userName,
-                r18: illust.xRestrict > 0,
-                tags: illust.tags,
+                id: parseInt(selectedIllust.id),
+                title: selectedIllust.title,
+                author: selectedIllust.userName,
+                r18: selectedIllust.xRestrict > 0,
+                tags: selectedIllust.tags,
                 extension: originalUrl.split('.').pop(),
                 aiType: 0,
-                uploadDate: new Date(illust.createDate).getTime(),
+                uploadDate: new Date(selectedIllust.createDate).getTime(),
                 urls: {
                     original: constructedUrl,
-                    regular: illust.url.replace('i.pximg.net', baseUrl)
+                    regular: selectedIllust.url.replace('i.pximg.net', baseUrl)
                 }
             }
 
@@ -129,7 +131,7 @@ export class PixivSourceProvider extends SourceProvider {
                 data: {
                     url: constructedUrl,
                     urls: {
-                        regular: illust.url.replace('i.pximg.net', baseUrl),
+                        regular: selectedIllust.url.replace('i.pximg.net', baseUrl),
                         original: constructedUrl
                     },
                     raw: generalImageData
@@ -141,6 +143,16 @@ export class PixivSourceProvider extends SourceProvider {
                 data: error
             }
         }
+    }
+
+    // 添加洗牌算法方法
+    private shuffleArray<T>(array: T[]): T[] {
+        const shuffled = [...array]
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        }
+        return shuffled
     }
 
     setConfig(config: Config) {
