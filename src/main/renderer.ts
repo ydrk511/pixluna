@@ -22,7 +22,7 @@ export async function render(ctx: Context, config: Config, tag: string) {
             return h('message', [h('text', { content: '没有获取到喵\n' })])
         }
 
-        ctx.logger.info('image ' + JSON.stringify(image))
+        ctx.logger.debug('image ' + JSON.stringify(image))
 
         return renderImageMessage(image)
     } catch (e) {

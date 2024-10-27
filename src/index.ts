@@ -4,9 +4,13 @@ import { ParallelPool } from './utils/data'
 import { render } from './main/renderer'
 import { taskTime } from './utils/data'
 import { getProvider, Providers, ProviderTypes } from './main/providers'
+import { createLogger, setLoggerLevel } from './utils/logger'
+
+export let logger: Logger
 
 export function apply(ctx: Context, config: Config) {
-    new Logger('pixluna', config)
+    logger = createLogger(ctx)
+    setupLogger(config)
 
     ctx.command('pixluna [tag:text]', '来张色图')
         .alias('色图')
@@ -72,11 +76,11 @@ export function apply(ctx: Context, config: Config) {
                     return session.send(messages)
                 })
             } catch (e) {
-                ctx.logger.error(e)
+                logger.error('发送消息时发生错误', { error: e })
             }
 
             if (id === undefined || id.length === 0) {
-                ctx.logger.error(`消息发送失败，账号可能被风控`)
+                logger.error('消息发送失败', { reason: '账号可能被风控' })
 
                 return h('', [
                     h('at', { id: session.userId }),
@@ -98,6 +102,12 @@ export function apply(ctx: Context, config: Config) {
             ])
             await session.send(message)
         })
+}
+
+function setupLogger(config: Config) {
+    if (config.isLog) {
+        setLoggerLevel(Logger.DEBUG)
+    }
 }
 
 export * from './config'

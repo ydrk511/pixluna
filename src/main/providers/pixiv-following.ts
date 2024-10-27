@@ -7,6 +7,7 @@ import type {
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
 import { shuffleArray } from '../../utils/shuffle'
+import { logger } from '../../index'
 
 interface PixivFollowingResponse {
     error: boolean
@@ -180,6 +181,8 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 }
             }
 
+            logger.debug('成功获取 Pixiv Following 图片元数据', { metadata: generalImageData })
+
             return {
                 status: 'success',
                 data: {
@@ -189,6 +192,7 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 }
             }
         } catch (error) {
+            logger.error('获取 Pixiv Discovery 元数据失败', { error })
             return {
                 status: 'error',
                 data: error

@@ -2,6 +2,7 @@ import { Context } from 'koishi'
 import { Config } from '../config'
 import { taskTime } from './data'
 import type {} from '@koishijs/plugin-proxy-agent'
+import { logger } from '../index'
 
 // 添加一个新的函数来检测MIME类型
 function detectMimeType(buffer: ArrayBuffer): string {
@@ -30,7 +31,6 @@ export async function fetchImageBuffer(
     config: Config,
     url: string
 ): Promise<[ArrayBuffer, string]> {
-
     return taskTime(ctx, 'fetchImage', async () => {
         const response = await ctx.http.get(url, {
             responseType: 'arraybuffer',
@@ -39,6 +39,9 @@ export async function fetchImageBuffer(
 
         // 使用新的detectMimeType函数来获取MIME类型
         const mimeType = detectMimeType(response)
+
+        // 使用logger打印获取到的MIME类型
+        logger.debug('检测到MIME类型', { mimeType })
 
         return [response, mimeType]
     })

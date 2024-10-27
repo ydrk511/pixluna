@@ -7,7 +7,7 @@ import type {
     SourceResponse
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
-import { PixlunaLogger, createLogger } from '../../utils/logger'
+import { logger } from '../../index'
 
 export interface LolisukiSourceRequest {
     r18?: number
@@ -43,18 +43,14 @@ interface LolisukiResponse {
 export class LolisukiSourceProvider extends SourceProvider {
     static RANDOM_IMAGE_URL = 'https://lolisuki.cn/api/setu/v1'
 
-    private logger: PixlunaLogger
-
     constructor(ctx: Context, config: Config) {
         super(ctx, config)
-        this.logger = createLogger(ctx, config)
     }
 
     async getMetaData(
         { context }: { context: Context },
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
-        this.logger.info('开始获取 Lolisuki 元数据')
         const requestParams: LolisukiSourceRequest = {
             r18: props.r18 ? 1 : 0,
             num: 1,
@@ -98,7 +94,7 @@ export class LolisukiSourceProvider extends SourceProvider {
             urls: imageData.urls
         }
 
-        this.logger.info('成功获取图片元数据', JSON.stringify(generalImageData, null, 2))
+        logger.debug('成功获取图片元数据', { metadata: generalImageData })
 
         return {
             status: 'success',
@@ -115,6 +111,5 @@ export class LolisukiSourceProvider extends SourceProvider {
 
     setConfig(config: Config) {
         this.config = config
-        this.logger = createLogger(this.ctx, config)
     }
 }

@@ -8,6 +8,7 @@ import type {
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
 import { shuffleArray } from '../../utils/shuffle'
+import { logger } from '../../index'
 
 interface PixivResponse {
     error: boolean
@@ -47,6 +48,7 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
         { context }: { context: Context },
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
+        logger.debug('开始获取 Pixiv Discovery 元数据')
         const requestParams: PixivDiscoverySourceRequest = {
             mode: props.r18 ? 'r18' : 'all',
             limit: 8 // 修改为获取8张图片
@@ -127,6 +129,8 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
                 }
             }
 
+            logger.debug('成功获取 Pixiv Discovery 图片元数据', { metadata: generalImageData })
+
             return {
                 status: 'success',
                 data: {
@@ -142,6 +146,7 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
                 }
             }
         } catch (error) {
+            logger.error('获取 Pixiv Discovery 元数据失败', { error })
             return {
                 status: 'error',
                 data: error
