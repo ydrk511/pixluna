@@ -1,7 +1,6 @@
 import { Context } from 'koishi'
 import type { Config } from '../../config'
 import type {
-    CommonSourceRequest,
     ImageMetaData,
     GeneralImageData,
     SourceResponse
