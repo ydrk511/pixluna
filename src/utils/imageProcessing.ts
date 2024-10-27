@@ -1,21 +1,13 @@
 import sharp from 'sharp'
 import { Context } from 'koishi'
-import { IMAGE_MINE_TYPE } from './getImageMimeType'
 
 export async function qualityImage(
     ctx: Context,
-    imageBuffer: ArrayBuffer,
-    imageType: IMAGE_MINE_TYPE
+    imageBuffer: ArrayBuffer
 ) {
     let image = sharp(imageBuffer)
 
-    let qualifiedImage: Buffer
-
-    if (imageType === 'jpeg' || imageType === 'jpg') {
-        qualifiedImage = await image.jpeg({ quality: 65 }).toBuffer()
-    } else {
-        qualifiedImage = await image.png({ quality: 65 }).toBuffer()
-    }
+    const qualifiedImage = await image.png({ quality: 65 }).toBuffer()
 
     image.destroy()
     image = undefined
@@ -25,14 +17,11 @@ export async function qualityImage(
 
 export async function mixImage(
     ctx: Context,
-    [imageBuffer, imageType]: [
-        imageBuffer: ArrayBuffer,
-        imageType: IMAGE_MINE_TYPE
-    ],
+    imageBuffer: ArrayBuffer,
     compress: boolean = false
 ) {
     if (compress) {
-        imageBuffer = await qualityImage(ctx, imageBuffer, imageType)
+        imageBuffer = await qualityImage(ctx, imageBuffer)
     }
 
     let image = sharp(imageBuffer)
@@ -73,5 +62,5 @@ export async function mixImage(
     image.destroy()
     image = undefined
 
-    return processedImageBuffer // 直接返回处理后的 Buffer
+    return processedImageBuffer
 }

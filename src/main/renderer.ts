@@ -3,14 +3,9 @@ import Config from '../config'
 import { getRemoteImage } from './request'
 import { GeneralImageData } from '../utils/type'
 
-function renderImageMessage(image: GeneralImageData & { data: string | h }): h {
-    const data =
-        typeof image.data === 'string'
-            ? h('image', { url: image.data })
-            : image.data
-
+function renderImageMessage(image: GeneralImageData & { data: Buffer, mimeType: string }): h {
     return h('message', [
-        data,
+        h.image(image.data, image.mimeType),
         h('text', { content: `\ntitle：${image.title}\n` }),
         h('text', { content: `id：${image.id}\n` }),
         h('text', {

@@ -1,7 +1,6 @@
-import { Context, h } from 'koishi'
+import { Context } from 'koishi'
 import Config from '../config'
 import { GeneralImageData } from '../utils/type'
-import { getImageMimeType } from '../utils/getImageMimeType'
 import { taskTime } from '../utils/data'
 import { qualityImage, mixImage } from '../utils/imageProcessing'
 import { fetchImageBuffer } from '../utils/imageFetcher'
@@ -13,7 +12,8 @@ export async function getRemoteImage(
     config: Config
 ): Promise<
     GeneralImageData & {
-        data: string | h
+        data: Buffer
+        mimeType: string
         raw: GeneralImageData
     }
 > {
@@ -40,7 +40,6 @@ export async function getRemoteImage(
         proxy: config.baseUrl ? config.baseUrl : void 0
     }
 
-    // 移除了 getInstance() 调用，因为 getProvider 现在直接返回实例
     const metadata = await provider.getMetaData(
         {
             context: ctx
@@ -55,42 +54,35 @@ export async function getRemoteImage(
     const response = metadata.data
     const { url, urls } = response
 
-    const data = await taskTime(ctx, 'mixImage', async () => {
-        const imageBufferArray = await fetchImageBuffer(ctx, config, url)
+    const [imageArrayBuffer, mimeType] = await fetchImageBuffer(
+        ctx,
+        config,
+        url
+    )
 
+    // 将 ArrayBuffer 转换为 Buffer
+    const imageBuffer = Buffer.from(imageArrayBuffer)
+
+    const data = await taskTime(ctx, 'mixImage', async () => {
         if (config.imageConfusion && sharp) {
-            const processedImageBuffer = await mixImage(
+            return await mixImage(
                 ctx,
-                imageBufferArray,
+                imageBuffer,
                 config.compress && !urls.regular
-            )
-            return h.image(
-                processedImageBuffer,
-                getImageMimeType(imageBufferArray[1])
             )
         }
 
         if (config.compress && !urls.regular && sharp) {
-            const compressedImageBuffer = await qualityImage(
-                ctx,
-                imageBufferArray[0],
-                imageBufferArray[1]
-            )
-            return h.image(
-                compressedImageBuffer,
-                getImageMimeType(imageBufferArray[1])
-            )
+            return await qualityImage(ctx, imageBuffer)
         }
 
-        return h.image(
-            imageBufferArray[0],
-            getImageMimeType(imageBufferArray[1])
-        )
+        return imageBuffer
     })
 
     return {
         ...metadata.data.raw,
         data,
+        mimeType,
         raw: metadata.data.raw
     }
 }
