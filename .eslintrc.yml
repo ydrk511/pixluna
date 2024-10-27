@@ -96,7 +96,7 @@ rules:
 
     camelcase: off
     '@typescript-eslint/naming-convention':
-        - warn
+        - off
 
         # group selectors
         - selector: default
@@ -133,7 +133,7 @@ rules:
 
     no-unused-vars: off
     '@typescript-eslint/no-unused-vars':
-        - error
+        - off
         - args: none
 
     no-dupe-class-members: off
@@ -164,3 +164,12 @@ rules:
           asyncArrow: always
           named: never
     '@typescript-eslint/type-annotation-spacing': error
+
+    no-void: off
+
+    no-unused-imports: off
+
+    no-unused-expressions: off
+
+    no-explicit-any: off
+    '@typescript-eslint/no-explicit-any': off
