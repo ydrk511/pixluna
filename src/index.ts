@@ -64,6 +64,7 @@ export function apply(ctx: Context, config: Config) {
             let id: string[]
             try {
                 id = await taskTime(ctx, 'send message', () => {
+                    const combinedMessage = h('message', messages)
                     if (config.forwardMessage) {
                         return session.send(
                             h(
@@ -73,8 +74,7 @@ export function apply(ctx: Context, config: Config) {
                             )
                         )
                     }
-
-                    return session.send(messages)
+                    return session.send(combinedMessage)
                 })
             } catch (e) {
                 logger.error('发送消息时发生错误', { error: e })

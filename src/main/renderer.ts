@@ -6,7 +6,7 @@ import { GeneralImageData } from '../utils/type'
 function renderImageMessage(
     image: GeneralImageData & { data: Buffer; mimeType: string }
 ): h {
-    return h('message', [
+    return h('', [
         h.image(image.data, image.mimeType),
         h('text', { content: `\ntitle：${image.title}\n` }),
         h('text', { content: `id：${image.id}\n` }),
