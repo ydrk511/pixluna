@@ -26,6 +26,7 @@
     ],
     "peerDependencies": {
         "@koishijs/plugin-proxy-agent": "^0.3.3",
+        "file-type": "^19.6.0",
         "koishi": "^4.17.0",
         "sharp": "^0.33.5"
     },
@@ -43,12 +44,12 @@
         "eslint-plugin-n": "^16.6.2",
         "eslint-plugin-prettier": "^5.2.1",
         "eslint-plugin-promise": "^7.1.0",
+        "file-type": "^19.6.0",
         "prettier": "^3.3.3",
         "sharp": "^0.33.5"
     },
     "dependencies": {
-        "@satorijs/element": "^3.1.7",
-        "file-type": "^19.6.0"
+        "@satorijs/element": "^3.1.7"
     },
     "koishi": {
         "description": {
