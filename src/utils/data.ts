@@ -1,7 +1,7 @@
 import { Context } from 'koishi'
 
 export class ParallelPool<T = any> {
-    private readonly pool: Array<Promise<T>>
+    private readonly pool: Promise<T>[]
     private readonly limit: number
 
     constructor(limit: number) {
@@ -37,9 +37,5 @@ export async function taskTime<T>(
     ctx
     name
 
-    try {
-        return await task()
-    } catch (error) {
-        throw error
-    }
+    return await task()
 }

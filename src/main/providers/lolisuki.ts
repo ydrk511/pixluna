@@ -2,8 +2,8 @@ import { Context } from 'koishi'
 import type { Config } from '../../config'
 import type {
     CommonSourceRequest,
-    ImageMetaData,
     GeneralImageData,
+    ImageMetaData,
     SourceResponse
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
@@ -22,7 +22,7 @@ export interface LolisukiSourceRequest {
 
 interface LolisukiResponse {
     error: string
-    data: Array<{
+    data: {
         pid: number
         p: number
         uid: number
@@ -37,7 +37,7 @@ interface LolisukiResponse {
             original: string
             regular?: string
         }
-    }>
+    }[]
 }
 
 export class LolisukiSourceProvider extends SourceProvider {
@@ -99,7 +99,7 @@ export class LolisukiSourceProvider extends SourceProvider {
         return {
             status: 'success',
             data: {
-                url: url,
+                url,
                 urls: {
                     regular: imageData.urls.regular,
                     original: imageData.urls.original

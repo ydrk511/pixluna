@@ -1,8 +1,7 @@
 import { Context, h, Logger } from 'koishi'
 import type Config from './config'
-import { ParallelPool } from './utils/data'
+import { ParallelPool, taskTime } from './utils/data'
 import { render } from './main/renderer'
-import { taskTime } from './utils/data'
 import { getProvider, Providers, ProviderTypes } from './main/providers'
 import { createLogger, setLoggerLevel } from './utils/logger'
 

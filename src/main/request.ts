@@ -2,7 +2,7 @@ import { Context } from 'koishi'
 import Config from '../config'
 import { GeneralImageData } from '../utils/type'
 import { taskTime } from '../utils/data'
-import { qualityImage, mixImage } from '../utils/imageProcessing'
+import { mixImage, qualityImage } from '../utils/imageProcessing'
 import { fetchImageBuffer } from '../utils/imageFetcher'
 import { getProvider } from './providers'
 

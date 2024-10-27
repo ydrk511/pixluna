@@ -1,8 +1,8 @@
 import { Context } from 'koishi'
 import type { Config } from '../../config'
 import type {
-    ImageMetaData,
     GeneralImageData,
+    ImageMetaData,
     SourceResponse
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
@@ -53,9 +53,9 @@ interface PixivIllustResponse {
             original: string
         }
         tags: {
-            tags: Array<{
+            tags: {
                 tag: string
-            }>
+            }[]
         }
         userName: string
     }
@@ -70,10 +70,13 @@ export interface PixivFollowingSourceRequest {
 export class PixivFollowingSourceProvider extends SourceProvider {
     static FOLLOWING_URL =
         'https://www.pixiv.net/ajax/user/{USER_ID}/following?offset={OFFSET_COUNT}&limit={LIMIT_COUNT}&rest=show'
+
     static ILLUST_PAGES_URL =
         'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
+
     static USER_PROFILE_URL =
         'https://www.pixiv.net/ajax/user/{USER_ID}/profile/all'
+
     static ILLUST_URL = 'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}'
 
     constructor(ctx: Context, config: Config) {
