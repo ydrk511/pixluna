@@ -132,20 +132,48 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 }
             }
 
-            // 从作品列表中随机选择一个
+            // 从作品列表中随机选择一个非R18作品
             const illustIds = Object.keys(userProfileRes.body.illusts)
-            const randomIllustId = shuffleArray(illustIds)[0]
+            let illustDetail: PixivIllustResponse
+            let attempts = 0
+            const maxAttempts = illustIds.length
 
-            // 获取插画详情
-            const illustDetail = await this.getIllustDetail(
-                context,
-                randomIllustId
-            )
+            do {
+                const randomIllustId = shuffleArray(illustIds)[0]
+                illustDetail = await this.getIllustDetail(
+                    context,
+                    randomIllustId
+                )
+                attempts++
 
-            if (illustDetail.error || !illustDetail.body) {
+                if (illustDetail.error || !illustDetail.body) {
+                    if (attempts >= maxAttempts) {
+                        return {
+                            status: 'error',
+                            data: new Error('无法获取合适的插画详情')
+                        }
+                    }
+                    continue
+                }
+
+                const isR18 =
+                    illustDetail.body.xRestrict > 0 ||
+                    illustDetail.body.tags.tags.some(
+                        (tag) => tag.tag.toLowerCase() === 'r-18'
+                    )
+
+                if (!this.config.isR18 && isR18) {
+                    this.logger.debug(`跳过 R18 作品: ${illustDetail.body.title}`)
+                    continue
+                }
+
+                break
+            } while (attempts < maxAttempts)
+
+            if (attempts >= maxAttempts) {
                 return {
                     status: 'error',
-                    data: new Error('无法获取插画详情')
+                    data: new Error('未找到符合条件的插画')
                 }
             }
 

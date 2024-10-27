@@ -2,7 +2,7 @@ import sharp from 'sharp'
 import { Context } from 'koishi'
 
 export async function qualityImage(
-    ctx: Context,
+    _ctx: Context,
     imageBuffer: ArrayBuffer
 ) {
     let image = sharp(imageBuffer)

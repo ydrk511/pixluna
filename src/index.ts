@@ -35,11 +35,11 @@ export function apply(ctx: Context, config: Config) {
             }
 
             // 修改这里,优先使用命令行参数
-            let provider;
+            let provider: ReturnType<typeof getProvider>;
             try {
                 provider = options.source
                     ? getProvider(ctx, { ...mergedConfig, defaultSourceProvider: options.source as ProviderTypes })
-                    : getProvider(ctx, mergedConfig)
+                    : getProvider(ctx, mergedConfig);
             } catch (error) {
                 return h('', [
                     h('at', { id: session.userId }),
