@@ -1,9 +1,30 @@
 import { Context } from 'koishi'
 import { Config } from '../config'
-import { fileTypeFromBuffer } from 'file-type'
 import { taskTime } from './data'
 import type {} from '@koishijs/plugin-proxy-agent'
 import { createLogger } from './logger'
+
+// 添加一个新的函数来检测MIME类型
+function detectMimeType(buffer: ArrayBuffer): string {
+    const arr = new Uint8Array(buffer).subarray(0, 4)
+    let header = ''
+    for (let i = 0; i < arr.length; i++) {
+        header += arr[i].toString(16)
+    }
+
+    switch (header) {
+        case '89504e47':
+            return 'image/png'
+        case 'ffd8ffe0':
+        case 'ffd8ffe1':
+        case 'ffd8ffe2':
+            return 'image/jpeg'
+        case '47494638':
+            return 'image/gif'
+        default:
+            return 'application/octet-stream'
+    }
+}
 
 export async function fetchImageBuffer(
     ctx: Context,
@@ -18,8 +39,8 @@ export async function fetchImageBuffer(
             proxyAgent: config.isProxy ? config.proxyHost : undefined
         })
 
-        const fileType = await fileTypeFromBuffer(response)
-        const mimeType = fileType?.mime || 'application/octet-stream'
+        // 使用新的detectMimeType函数来获取MIME类型
+        const mimeType = detectMimeType(response)
 
         logger.debug(`获取到的图片 MIME type: ${mimeType}`)
 
