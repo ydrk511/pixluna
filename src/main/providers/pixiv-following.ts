@@ -7,7 +7,6 @@ import type {
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
 import { shuffleArray } from '../../utils/shuffle'
-import { PixlunaLogger, createLogger } from '../../utils/logger'
 
 interface PixivFollowingResponse {
     error: boolean
@@ -76,11 +75,8 @@ export class PixivFollowingSourceProvider extends SourceProvider {
         'https://www.pixiv.net/ajax/user/{USER_ID}/profile/all'
     static ILLUST_URL = 'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}'
 
-    private logger: PixlunaLogger
-
     constructor(ctx: Context, config: Config) {
         super(ctx, config)
-        this.logger = createLogger(ctx, config)
     }
 
     async getMetaData({
@@ -88,9 +84,7 @@ export class PixivFollowingSourceProvider extends SourceProvider {
     }: {
         context: Context
     }): Promise<SourceResponse<ImageMetaData>> {
-        this.logger.debug('开始获取 Pixiv Following 元数据')
         if (!this.config.pixiv.phpSESSID) {
-            this.logger.error('未设置 Pixiv PHPSESSID')
             return {
                 status: 'error',
                 data: new Error('未设置 Pixiv PHPSESSID')
@@ -102,10 +96,6 @@ export class PixivFollowingSourceProvider extends SourceProvider {
             const followingRes = await this.getFollowingUsers(context)
 
             if (followingRes.error || !followingRes.body.users.length) {
-                this.logger.error(
-                    'Pixiv Following API 返回错误或无关注用户',
-                    followingRes.error
-                )
                 return {
                     status: 'error',
                     data: new Error(followingRes.message || '未找到关注的用户')
@@ -114,9 +104,6 @@ export class PixivFollowingSourceProvider extends SourceProvider {
 
             // 随机选择一个关注的用户
             const randomUser = shuffleArray(followingRes.body.users)[0]
-            this.logger.debug(
-                `随机选择用户: ${randomUser.userName} (ID: ${randomUser.userId})`
-            )
 
             // 获取该用户的所有作品
             const userProfileRes = await this.getUserProfile(
@@ -125,7 +112,6 @@ export class PixivFollowingSourceProvider extends SourceProvider {
             )
 
             if (userProfileRes.error || !userProfileRes.body.illusts) {
-                this.logger.error('获取用户作品列表失败', userProfileRes.error)
                 return {
                     status: 'error',
                     data: new Error('无法获取用户作品列表')
@@ -163,7 +149,6 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                     )
 
                 if (!this.config.isR18 && isR18) {
-                    this.logger.debug(`跳过 R18 作品: ${illustDetail.body.title}`)
                     continue
                 }
 
@@ -195,11 +180,6 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 }
             }
 
-            this.logger.debug(
-                '成功获取图片元数据',
-                JSON.stringify(generalImageData, null, 2)
-            )
-
             return {
                 status: 'success',
                 data: {
@@ -209,7 +189,6 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 }
             }
         } catch (error) {
-            this.logger.error('获取 Pixiv Following 元数据时发生错误', error)
             return {
                 status: 'error',
                 data: error
@@ -287,6 +266,5 @@ export class PixivFollowingSourceProvider extends SourceProvider {
 
     setConfig(config: Config) {
         this.config = config
-        this.logger = createLogger(this.ctx, config)
     }
 }

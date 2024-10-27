@@ -54,7 +54,7 @@ export class LoliconSourceProvider extends SourceProvider {
         { context }: { context: Context },
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
-        this.logger.debug('开始获取 Lolicon 元数据')
+        this.logger.info('开始获取 Lolicon 元数据')
         const requestParams: LoliconSourceRequest = {
             r18: props.r18 ? 1 : 0,
             num: 1,
@@ -98,7 +98,7 @@ export class LoliconSourceProvider extends SourceProvider {
             urls: imageData.urls
         }
 
-        this.logger.debug('成功获取图片元数据', JSON.stringify(generalImageData, null, 2))
+        this.logger.info('成功获取图片元数据', JSON.stringify(generalImageData, null, 2))
 
         return {
             status: 'success',

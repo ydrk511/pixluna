@@ -1,13 +1,12 @@
-import { Context, h } from 'koishi'
+import { Context, h, Logger } from 'koishi'
 import type Config from './config'
 import { ParallelPool } from './utils/data'
 import { render } from './main/renderer'
 import { taskTime } from './utils/data'
 import { getProvider, Providers, ProviderTypes } from './main/providers'
-import { createLogger } from './utils/logger'
 
 export function apply(ctx: Context, config: Config) {
-    const logger = createLogger(ctx, config)
+    new Logger('pixluna', config)
 
     ctx.command('pixluna [tag:text]', '来张色图')
         .alias('色图')
@@ -16,12 +15,6 @@ export function apply(ctx: Context, config: Config) {
         })
         .option('source', '-s <source:string>', { fallback: '' })
         .action(async ({ session, options }, tag) => {
-            logger.debug(
-                'Command executed with options:',
-                options,
-                'and tag:',
-                tag
-            )
 
             await session.send('不可以涩涩哦~')
 
@@ -49,15 +42,12 @@ export function apply(ctx: Context, config: Config) {
                 ])
             }
 
-            logger.debug('Source provider selected:', provider.constructor.name)
-
             const messages: h[] = []
             const pool = new ParallelPool<void>(config.maxConcurrency)
 
             for (let i = 0; i < Math.min(10, options.n); i++) {
                 pool.add(
                     taskTime(ctx, `${i + 1} image`, async () => {
-                        logger.debug(`Processing image ${i + 1}`)
                         const message = await render(ctx, mergedConfig, tag)
                         messages.push(message)
                     })
@@ -86,7 +76,7 @@ export function apply(ctx: Context, config: Config) {
             }
 
             if (id === undefined || id.length === 0) {
-                logger.error(`消息发送失败，账号可能被风控`)
+                ctx.logger.error(`消息发送失败，账号可能被风控`)
 
                 return h('', [
                     h('at', { id: session.userId }),

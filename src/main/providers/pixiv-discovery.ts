@@ -8,7 +8,6 @@ import type {
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
 import { shuffleArray } from '../../utils/shuffle'
-import { PixlunaLogger, createLogger } from '../../utils/logger'
 
 interface PixivResponse {
     error: boolean
@@ -40,25 +39,20 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
     static ILLUST_PAGES_URL =
         'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
 
-    private logger: PixlunaLogger
-
     constructor(ctx: Context, config: Config) {
         super(ctx, config)
-        this.logger = createLogger(ctx, config)
     }
 
     async getMetaData(
         { context }: { context: Context },
         props: CommonSourceRequest
     ): Promise<SourceResponse<ImageMetaData>> {
-        this.logger.debug('开始获取 Pixiv Discovery 元数据')
         const requestParams: PixivDiscoverySourceRequest = {
             mode: props.r18 ? 'r18' : 'all',
             limit: 8 // 修改为获取8张图片
         }
 
         const url = `${PixivDiscoverySourceProvider.DISCOVERY_URL}?mode=${requestParams.mode}&limit=${requestParams.limit}`
-        this.logger.debug(`请求 URL: ${url}`)
 
         const headers = {
             Referer: 'https://www.pixiv.net/',
@@ -80,22 +74,20 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
             })
 
             if (discoveryRes.error || !discoveryRes.body.illusts.length) {
-                this.logger.error('Pixiv Discovery API 返回错误或无插画', discoveryRes.error)
                 return {
                     status: 'error',
                     data: new Error(discoveryRes.message || '未找到插画')
                 }
             }
 
-            this.logger.debug(`成功获取 ${discoveryRes.body.illusts.length} 张插画`)
             const shuffledIllusts = shuffleArray(discoveryRes.body.illusts)
             const selectedIllust = shuffledIllusts[0]
-            this.logger.debug(`随机选择插画 ID: ${selectedIllust.id}`)
 
-            const illustPagesUrl = PixivDiscoverySourceProvider.ILLUST_PAGES_URL.replace(
-                '{ARTWORK_ID}',
-                selectedIllust.id
-            )
+            const illustPagesUrl =
+                PixivDiscoverySourceProvider.ILLUST_PAGES_URL.replace(
+                    '{ARTWORK_ID}',
+                    selectedIllust.id
+                )
             const illustPagesRes = await context.http.get(illustPagesUrl, {
                 headers: {
                     Referer: 'https://www.pixiv.net/',
@@ -135,7 +127,6 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
                 }
             }
 
-            this.logger.debug('成功获取图片元数据', JSON.stringify(generalImageData, null, 2))
             return {
                 status: 'success',
                 data: {
@@ -151,7 +142,6 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
                 }
             }
         } catch (error) {
-            this.logger.error('获取 Pixiv Discovery 元数据时发生错误', error)
             return {
                 status: 'error',
                 data: error
@@ -161,6 +151,5 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
 
     setConfig(config: Config) {
         this.config = config
-        this.logger = createLogger(this.ctx, config)
     }
 }
