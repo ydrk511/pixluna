@@ -6,13 +6,17 @@ import { PixivDiscoverySourceProvider } from './providers/pixiv-discovery'
 import { PixivFollowingSourceProvider } from './providers/pixiv-following'
 import type { Config } from '../config'
 
-export type ProviderTypes = 'lolicon' | 'lolisuki' | 'pixiv-discovery' | 'pixiv-following'
+export type ProviderTypes =
+    | 'lolicon'
+    | 'lolisuki'
+    | 'pixiv-discovery'
+    | 'pixiv-following'
 
 export const Providers: {
     [K in ProviderTypes]: new (ctx: Context, config: Config) => SourceProvider
 } = {
-    'lolicon': LoliconSourceProvider,
-    'lolisuki': LolisukiSourceProvider,
+    lolicon: LoliconSourceProvider,
+    lolisuki: LolisukiSourceProvider,
     'pixiv-discovery': PixivDiscoverySourceProvider,
     'pixiv-following': PixivFollowingSourceProvider
 }

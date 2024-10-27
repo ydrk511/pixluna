@@ -1,10 +1,7 @@
 import sharp from 'sharp'
 import { Context } from 'koishi'
 
-export async function qualityImage(
-    _ctx: Context,
-    imageBuffer: ArrayBuffer
-) {
+export async function qualityImage(_ctx: Context, imageBuffer: ArrayBuffer) {
     let image = sharp(imageBuffer)
 
     const qualifiedImage = await image.png({ quality: 65 }).toBuffer()

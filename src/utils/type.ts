@@ -60,7 +60,10 @@ export type SourceResponse<
         }
 
 export abstract class SourceProvider {
-    protected constructor(protected ctx: Context, protected config: Config) {}
+    protected constructor(
+        protected ctx: Context,
+        protected config: Config
+    ) {}
 
     abstract getMetaData(
         context: { context: Context },

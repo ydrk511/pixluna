@@ -129,7 +129,9 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
                 }
             }
 
-            logger.debug('成功获取 Pixiv Discovery 图片元数据', { metadata: generalImageData })
+            logger.debug('成功获取 Pixiv Discovery 图片元数据', {
+                metadata: generalImageData
+            })
 
             return {
                 status: 'success',

@@ -19,7 +19,6 @@ export function apply(ctx: Context, config: Config) {
         })
         .option('source', '-s <source:string>', { fallback: '' })
         .action(async ({ session, options }, tag) => {
-
             await session.send('不可以涩涩哦~')
 
             // 创建一个新的配置对象,合并命令行参数和默认配置
@@ -32,11 +31,14 @@ export function apply(ctx: Context, config: Config) {
             }
 
             // 修改这里,优先使用命令行参数
-            let provider: ReturnType<typeof getProvider>;
+            let provider: ReturnType<typeof getProvider>
             try {
                 provider = options.source
-                    ? getProvider(ctx, { ...mergedConfig, defaultSourceProvider: options.source as ProviderTypes })
-                    : getProvider(ctx, mergedConfig);
+                    ? getProvider(ctx, {
+                          ...mergedConfig,
+                          defaultSourceProvider: options.source as ProviderTypes
+                      })
+                    : getProvider(ctx, mergedConfig)
             } catch (error) {
                 return h('', [
                     h('at', { id: session.userId }),

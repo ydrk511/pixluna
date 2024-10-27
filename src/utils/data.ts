@@ -34,8 +34,8 @@ export async function taskTime<T>(
     name: string,
     task: () => Promise<T>
 ): Promise<T> {
-    ctx;
-    name;
+    ctx
+    name
 
     try {
         return await task()

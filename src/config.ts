@@ -11,7 +11,12 @@ export interface Config {
     maxConcurrency: number
     forwardMessage: boolean
     compress: boolean
-    defaultSourceProvider: 'none' | 'lolicon' | 'lolisuki' | 'pixiv-discovery' | 'pixiv-following'
+    defaultSourceProvider:
+        | 'none'
+        | 'lolicon'
+        | 'lolisuki'
+        | 'pixiv-discovery'
+        | 'pixiv-following'
     isLog: boolean
     pixiv: {
         phpSESSID: string
@@ -51,7 +56,9 @@ export const Config: Schema<Config> = Schema.intersect([
 
         compress: Schema.boolean()
             .default(false)
-            .description('是否压缩图片（能大幅度提升发送的速度，但是对图片质量有影响）')
+            .description(
+                '是否压缩图片（能大幅度提升发送的速度，但是对图片质量有影响）'
+            )
     }).description('通用设置'),
 
     // R18 内容设置
@@ -93,7 +100,9 @@ export const Config: Schema<Config> = Schema.intersect([
     Schema.object({
         pixiv: Schema.object({
             phpSESSID: Schema.string()
-                .description('Pixiv 的 PHPSESSID，用于访问个性化内容。返回的图片分级取决于该 Pixiv 账号所有者的分级设置。')
+                .description(
+                    'Pixiv 的 PHPSESSID，用于访问个性化内容。返回的图片分级取决于该 Pixiv 账号所有者的分级设置。'
+                )
                 .default(''),
             following: Schema.object({
                 userId: Schema.string()
