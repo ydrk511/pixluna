@@ -1,7 +1,7 @@
 {
     "name": "koishi-plugin-pixluna",
     "description": "比较新的涩图插件（？",
-    "version": "2.1.2-beta.3",
+    "version": "2.1.2-beta.4",
     "main": "dist/index.js",
     "files": [
         "dist"
@@ -26,7 +26,6 @@
     ],
     "peerDependencies": {
         "@koishijs/plugin-proxy-agent": "^0.3.3",
-        "file-type": "^19.6.0",
         "koishi": "^4.17.0",
         "sharp": "^0.33.5"
     },
@@ -44,12 +43,12 @@
         "eslint-plugin-n": "^16.6.2",
         "eslint-plugin-prettier": "^5.2.1",
         "eslint-plugin-promise": "^7.1.0",
-        "file-type": "^19.6.0",
         "prettier": "^3.3.3",
         "sharp": "^0.33.5"
     },
     "dependencies": {
-        "@satorijs/element": "^3.1.7"
+        "@satorijs/element": "^3.1.7",
+        "file-type": "^19.6.0"
     },
     "koishi": {
         "description": {

@@ -34,9 +34,12 @@ export async function taskTime<T>(
     name: string,
     task: () => Promise<T>
 ): Promise<T> {
-    const start = Date.now()
+    void ctx;
+    void name;
 
-    return task().finally(() => {
-        ctx.logger.debug(`task: ${name}, time: ${Date.now() - start}ms`)
-    })
+    try {
+        return await task()
+    } catch (error) {
+        throw error
+    }
 }
