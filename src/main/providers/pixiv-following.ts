@@ -38,18 +38,27 @@ interface PixivUserProfileResponse {
     message: string
     body: {
         illusts: { [key: string]: null }
-        // ... 其他字段 ...
     }
 }
 
-interface PixivIllustPagesResponse {
+interface PixivIllustResponse {
     error: boolean
     message: string
     body: {
+        id: string
+        title: string
+        xRestrict: number
+        createDate: string
         urls: {
             original: string
         }
-    }[]
+        tags: {
+            tags: Array<{
+                tag: string
+            }>
+        }
+        userName: string
+    }
 }
 
 export interface PixivFollowingSourceRequest {
@@ -65,6 +74,7 @@ export class PixivFollowingSourceProvider extends SourceProvider {
         'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}/pages'
     static USER_PROFILE_URL =
         'https://www.pixiv.net/ajax/user/{USER_ID}/profile/all'
+    static ILLUST_URL = 'https://www.pixiv.net/ajax/illust/{ARTWORK_ID}'
 
     private logger: PixlunaLogger
 
@@ -73,9 +83,11 @@ export class PixivFollowingSourceProvider extends SourceProvider {
         this.logger = createLogger(ctx, config)
     }
 
-    async getMetaData(
-        { context }: { context: Context },
-    ): Promise<SourceResponse<ImageMetaData>> {
+    async getMetaData({
+        context
+    }: {
+        context: Context
+    }): Promise<SourceResponse<ImageMetaData>> {
         this.logger.debug('开始获取 Pixiv Following 元数据')
         if (!this.config.pixiv.phpSESSID) {
             this.logger.error('未设置 Pixiv PHPSESSID')
@@ -130,38 +142,26 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 randomIllustId
             )
 
-            if (!illustDetail) {
+            if (illustDetail.error || !illustDetail.body) {
                 return {
                     status: 'error',
                     data: new Error('无法获取插画详情')
                 }
             }
 
-            // 获取插画页面信息（包含原始URL）
-            const illustPages = await this.getIllustPages(
-                context,
-                randomIllustId
-            )
-
-            if (illustPages.error || !illustPages.body.length) {
-                return {
-                    status: 'error',
-                    data: new Error('无法获取插画页面信息')
-                }
-            }
-
-            const originalUrl = illustPages.body[0].urls.original
+            const illustData = illustDetail.body
+            const originalUrl = illustData.urls.original
 
             // 构造返回数据
             const generalImageData: GeneralImageData = {
-                id: parseInt(randomIllustId),
-                title: illustDetail.title,
-                author: illustDetail.userName,
-                r18: illustDetail.xRestrict > 0,
-                tags: illustDetail.tags,
+                id: parseInt(illustData.id),
+                title: illustData.title,
+                author: illustData.userName,
+                r18: illustData.xRestrict > 0,
+                tags: illustData.tags.tags.map((tag) => tag.tag),
                 extension: originalUrl.split('.').pop(),
                 aiType: 0,
-                uploadDate: new Date(illustDetail.createDate).getTime(),
+                uploadDate: new Date(illustData.createDate).getTime(),
                 urls: {
                     original: this.constructImageUrl(originalUrl)
                 }
@@ -228,24 +228,12 @@ export class PixivFollowingSourceProvider extends SourceProvider {
     private async getIllustDetail(
         context: Context,
         illustId: string
-    ): Promise<any> {
-        const url = `https://www.pixiv.net/ajax/illust/${illustId}`
-        const response = await context.http.get<any>(url, {
-            headers: this.getHeaders(),
-            proxyAgent: this.getProxyAgent()
-        })
-        return response.body
-    }
-
-    private async getIllustPages(
-        context: Context,
-        illustId: string
-    ): Promise<PixivIllustPagesResponse> {
-        const url = PixivFollowingSourceProvider.ILLUST_PAGES_URL.replace(
+    ): Promise<PixivIllustResponse> {
+        const url = PixivFollowingSourceProvider.ILLUST_URL.replace(
             '{ARTWORK_ID}',
             illustId
         )
-        return await context.http.get<PixivIllustPagesResponse>(url, {
+        return await context.http.get<PixivIllustResponse>(url, {
             headers: this.getHeaders(),
             proxyAgent: this.getProxyAgent()
         })
