@@ -209,7 +209,7 @@ export class PixivFollowingSourceProvider extends SourceProvider {
         context: Context
     ): Promise<PixivFollowingResponse['body']['users']> {
         let offset = 0
-        const limit = this.config.pixiv.following.limit
+        const LIMIT = 100
         let allUsers: PixivFollowingResponse['body']['users'] = []
 
         while (true) {
@@ -218,7 +218,7 @@ export class PixivFollowingSourceProvider extends SourceProvider {
                 this.config.pixiv.following.userId
             )
                 .replace('{OFFSET_COUNT}', offset.toString())
-                .replace('{LIMIT_COUNT}', limit.toString())
+                .replace('{LIMIT_COUNT}', LIMIT.toString())
 
             const response = await context.http.get<PixivFollowingResponse>(
                 url,
@@ -233,10 +233,10 @@ export class PixivFollowingSourceProvider extends SourceProvider {
             }
 
             allUsers = [...allUsers, ...response.body.users]
-            offset += limit
+            offset += LIMIT
 
             // 如果返回的用户数小于限制数，说明已经到达末尾
-            if (response.body.users.length < limit) {
+            if (response.body.users.length < LIMIT) {
                 break
             }
         }
