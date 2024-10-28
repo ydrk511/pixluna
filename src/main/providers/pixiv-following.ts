@@ -96,18 +96,18 @@ export class PixivFollowingSourceProvider extends SourceProvider {
         }
 
         try {
-            // 获取关注列表
-            const followingRes = await this.getFollowingUsers(context)
+            // 获取所有关注列表
+            const allUsers = await this.getAllFollowingUsers(context)
 
-            if (followingRes.error || !followingRes.body.users.length) {
+            if (!allUsers.length) {
                 return {
                     status: 'error',
-                    data: new Error(followingRes.message || '未找到关注的用户')
+                    data: new Error('未找到关注的用户')
                 }
             }
 
             // 随机选择一个关注的用户
-            const randomUser = shuffleArray(followingRes.body.users)[0]
+            const randomUser = shuffleArray(allUsers)[0]
 
             // 获取该用户的所有作品
             const userProfileRes = await this.getUserProfile(
@@ -205,26 +205,43 @@ export class PixivFollowingSourceProvider extends SourceProvider {
         }
     }
 
-    private async getFollowingUsers(
+    private async getAllFollowingUsers(
         context: Context
-    ): Promise<PixivFollowingResponse> {
-        const url = PixivFollowingSourceProvider.FOLLOWING_URL.replace(
-            '{USER_ID}',
-            this.config.pixiv.following.userId
-        )
-            .replace(
-                '{OFFSET_COUNT}',
-                this.config.pixiv.following.offset.toString()
+    ): Promise<PixivFollowingResponse['body']['users']> {
+        let offset = 0
+        const limit = this.config.pixiv.following.limit
+        let allUsers: PixivFollowingResponse['body']['users'] = []
+
+        while (true) {
+            const url = PixivFollowingSourceProvider.FOLLOWING_URL.replace(
+                '{USER_ID}',
+                this.config.pixiv.following.userId
             )
-            .replace(
-                '{LIMIT_COUNT}',
-                this.config.pixiv.following.limit.toString()
+                .replace('{OFFSET_COUNT}', offset.toString())
+                .replace('{LIMIT_COUNT}', limit.toString())
+
+            const response = await context.http.get<PixivFollowingResponse>(
+                url,
+                {
+                    headers: this.getHeaders(),
+                    proxyAgent: this.getProxyAgent()
+                }
             )
 
-        return await context.http.get<PixivFollowingResponse>(url, {
-            headers: this.getHeaders(),
-            proxyAgent: this.getProxyAgent()
-        })
+            if (response.error || !response.body.users.length) {
+                break
+            }
+
+            allUsers = [...allUsers, ...response.body.users]
+            offset += limit
+
+            // 如果返回的用户数小于限制数，说明已经到达末尾
+            if (response.body.users.length < limit) {
+                break
+            }
+        }
+
+        return allUsers
     }
 
     private async getUserProfile(

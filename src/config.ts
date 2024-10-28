@@ -17,7 +17,6 @@ export interface Config {
         phpSESSID: string
         following: {
             userId: string
-            offset: number
             limit: number
         }
     }
@@ -105,14 +104,11 @@ export const Config: Schema<Config> = Schema.intersect([
                 userId: Schema.string()
                     .description('Pixiv 用户 ID，用于获取关注列表')
                     .default(''),
-                offset: Schema.number()
-                    .description('关注列表的偏移量')
-                    .default(0)
-                    .min(0),
                 limit: Schema.number()
                     .description('获取关注列表的数量限制')
-                    .default(10)
+                    .default(100)
                     .min(1)
+                    .max(100)
             }).description('Pixiv Following 设置')
         }).description('Pixiv 设置')
     }),
