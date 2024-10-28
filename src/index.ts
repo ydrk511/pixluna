@@ -2,7 +2,7 @@ import { Context, h, Logger } from 'koishi'
 import type Config from './config'
 import { ParallelPool, taskTime } from './utils/data'
 import { render } from './main/renderer'
-import { getProvider, Providers} from './main/providers'
+import { getProvider, Providers } from './main/providers'
 import { createLogger, setLoggerLevel } from './utils/logger'
 
 export let logger: Logger
@@ -29,11 +29,16 @@ export function apply(ctx: Context, config: Config) {
 
             await session.send('不可以涩涩哦~')
 
+            // 确保 defaultSourceProvider 始终是数组
+            const sourceProviders = Array.isArray(config.defaultSourceProvider)
+                ? config.defaultSourceProvider
+                : [config.defaultSourceProvider]
+
             const mergedConfig: Config = {
                 ...config,
                 defaultSourceProvider: options.source
                     ? [options.source]
-                    : config.defaultSourceProvider
+                    : sourceProviders
             }
 
             // 验证图源是否有效

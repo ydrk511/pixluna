@@ -16,8 +16,8 @@ export type ProviderTypes =
 export const Providers: {
     [K in ProviderTypes]: new (ctx: Context, config: Config) => SourceProvider
 } = {
-    'lolicon': LoliconSourceProvider,
-    'lolisuki': LolisukiSourceProvider,
+    lolicon: LoliconSourceProvider,
+    lolisuki: LolisukiSourceProvider,
     'pixiv-discovery': PixivDiscoverySourceProvider,
     'pixiv-following': PixivFollowingSourceProvider
 }
