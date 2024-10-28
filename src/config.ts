@@ -11,12 +11,7 @@ export interface Config {
     maxConcurrency: number
     forwardMessage: boolean
     compress: boolean
-    defaultSourceProvider:
-        | 'none'
-        | 'lolicon'
-        | 'lolisuki'
-        | 'pixiv-discovery'
-        | 'pixiv-following'
+    defaultSourceProvider: string[]
     isLog: boolean
     pixiv: {
         phpSESSID: string
@@ -85,15 +80,17 @@ export const Config: Schema<Config> = Schema.intersect([
 
     // 图源设置
     Schema.object({
-        defaultSourceProvider: Schema.union([
-            Schema.const('none').description('无'),
-            Schema.const('lolicon').description('Lolicon API'),
-            Schema.const('lolisuki').description('Lolisuki API'),
-            Schema.const('pixiv-discovery').description('Pixiv Discovery'),
-            Schema.const('pixiv-following').description('Pixiv Following')
-        ])
-            .description('选择默认图片来源')
-            .default('lolicon')
+        defaultSourceProvider: Schema.array(
+            Schema.union([
+                Schema.const('lolicon').description('Lolicon API'),
+                Schema.const('lolisuki').description('Lolisuki API'),
+                Schema.const('pixiv-discovery').description('Pixiv Discovery'),
+                Schema.const('pixiv-following').description('Pixiv Following')
+            ])
+        )
+            .description('选择默认图片来源（可多选）')
+            .default(['lolicon'])
+            .role('select')
     }).description('图源设置'),
 
     // Pixiv 设置

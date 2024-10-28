@@ -31,21 +31,19 @@ export function apply(ctx: Context, config: Config) {
 
             const mergedConfig: Config = {
                 ...config,
-                defaultSourceProvider:
-                    (options.source as Config['defaultSourceProvider']) ||
-                    config.defaultSourceProvider
-                // 可以在这里添加其他需要从命令行参数覆盖的配置项
+                defaultSourceProvider: options.source
+                    ? [options.source]
+                    : config.defaultSourceProvider
             }
 
-            // 修改这里,优先使用命令行参数
-            let provider: ReturnType<typeof getProvider>
+            // 验证图源是否有效
             try {
-                provider = options.source
-                    ? getProvider(ctx, {
-                          ...mergedConfig,
-                          defaultSourceProvider: options.source as ProviderTypes
-                      })
-                    : getProvider(ctx, mergedConfig)
+                if (options.source) {
+                    getProvider(ctx, {
+                        ...mergedConfig,
+                        defaultSourceProvider: [options.source]
+                    })
+                }
             } catch (error) {
                 return h('', [
                     h('at', { id: session.userId }),
@@ -61,7 +59,12 @@ export function apply(ctx: Context, config: Config) {
             for (let i = 0; i < Math.min(10, options.n); i++) {
                 pool.add(
                     taskTime(ctx, `${i + 1} image`, async () => {
-                        const message = await render(ctx, mergedConfig, tag)
+                        const message = await render(
+                            ctx,
+                            mergedConfig,
+                            tag,
+                            options.source
+                        )
                         messages.push(message)
                     })
                 )

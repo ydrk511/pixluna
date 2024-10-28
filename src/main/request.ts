@@ -9,7 +9,8 @@ import { getProvider } from './providers'
 export async function getRemoteImage(
     ctx: Context,
     tag: string,
-    config: Config
+    config: Config,
+    specificProvider?: string
 ): Promise<
     GeneralImageData & {
         data: Buffer
@@ -17,7 +18,7 @@ export async function getRemoteImage(
         raw: GeneralImageData
     }
 > {
-    const provider = getProvider(ctx, config)
+    const provider = getProvider(ctx, config, specificProvider)
     if (!provider) {
         throw new Error('未选择有效的图片来源，请检查配置')
     }

@@ -16,9 +16,14 @@ function renderImageMessage(
     ])
 }
 
-export async function render(ctx: Context, config: Config, tag: string) {
+export async function render(
+    ctx: Context,
+    config: Config,
+    tag?: string,
+    specificProvider?: string
+) {
     try {
-        const image = await getRemoteImage(ctx, tag, config)
+        const image = await getRemoteImage(ctx, tag, config, specificProvider)
 
         if (!image) {
             return h('message', [h('text', { content: '没有获取到喵\n' })])
