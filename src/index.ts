@@ -18,9 +18,17 @@ export function apply(ctx: Context, config: Config) {
         })
         .option('source', '-s <source:string>', { fallback: '' })
         .action(async ({ session, options }, tag) => {
+            if (!Number.isInteger(options.n) || options.n <= 0) {
+                return h('', [
+                    h('at', { id: session.userId }),
+                    h('text', {
+                        content: ' 图片数量必须是大于0的整数喵~'
+                    })
+                ])
+            }
+
             await session.send('不可以涩涩哦~')
 
-            // 创建一个新的配置对象,合并命令行参数和默认配置
             const mergedConfig: Config = {
                 ...config,
                 defaultSourceProvider:
