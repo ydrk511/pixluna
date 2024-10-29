@@ -55,14 +55,15 @@ export async function getRemoteImage(
     const response = metadata.data
     const { url, urls } = response
 
-    const [imageArrayBuffer, mimeType] = await fetchImageBuffer(
+    const [buffer, mimeType] = await fetchImageBuffer(
         ctx,
         config,
-        url
+        url,
+        provider
     )
 
     // 将 ArrayBuffer 转换为 Buffer
-    const imageBuffer = Buffer.from(imageArrayBuffer)
+    const imageBuffer = Buffer.from(buffer)
 
     const data = await taskTime(ctx, 'mixImage', async () => {
         if (config.imageConfusion && sharp) {

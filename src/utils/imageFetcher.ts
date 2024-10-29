@@ -3,6 +3,7 @@ import { Config } from '../config'
 import { taskTime } from './data'
 import type {} from '@koishijs/plugin-proxy-agent'
 import { logger } from '../index'
+import { SourceProvider } from './type'
 
 // 添加一个新的函数来检测MIME类型
 function detectMimeType(buffer: ArrayBuffer): string {
@@ -26,21 +27,33 @@ function detectMimeType(buffer: ArrayBuffer): string {
     }
 }
 
+// 添加 UA 常量
+export const USER_AGENT =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+
 export async function fetchImageBuffer(
     ctx: Context,
     config: Config,
-    url: string
+    url: string,
+    provider?: SourceProvider
 ): Promise<[ArrayBuffer, string]> {
     return taskTime(ctx, 'fetchImage', async () => {
+        const headers: Record<string, string> = {
+            'User-Agent': USER_AGENT
+        }
+
+        // 如果提供者有 referer，添加到请求头
+        if (provider?.getMeta?.()?.referer) {
+            headers['Referer'] = provider.getMeta().referer
+        }
+
         const response = await ctx.http.get(url, {
             responseType: 'arraybuffer',
-            proxyAgent: config.isProxy ? config.proxyHost : undefined
+            proxyAgent: config.isProxy ? config.proxyHost : undefined,
+            headers
         })
 
-        // 使用新的detectMimeType函数来获取MIME类型
         const mimeType = detectMimeType(response)
-
-        // 使用logger打印获取到的MIME类型
         logger.debug('检测到MIME类型', { mimeType })
 
         return [response, mimeType]

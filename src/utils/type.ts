@@ -59,6 +59,10 @@ export type SourceResponse<
             data: any
         }
 
+export interface ImageSourceMeta {
+    referer?: string
+}
+
 export abstract class SourceProvider {
     protected constructor(
         protected ctx: Context,
@@ -71,4 +75,6 @@ export abstract class SourceProvider {
     ): Promise<SourceResponse<ImageMetaData>>
 
     abstract setConfig(config: Config): void
+
+    getMeta?(): ImageSourceMeta
 }

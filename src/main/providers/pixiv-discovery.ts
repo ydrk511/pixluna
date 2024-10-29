@@ -4,11 +4,13 @@ import type {
     CommonSourceRequest,
     GeneralImageData,
     ImageMetaData,
+    ImageSourceMeta,
     SourceResponse
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
 import { shuffleArray } from '../../utils/shuffle'
 import { logger } from '../../index'
+import { USER_AGENT } from '../../utils/imageFetcher'
 
 interface PixivResponse {
     error: boolean
@@ -58,8 +60,7 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
 
         const headers = {
             Referer: 'https://www.pixiv.net/',
-            'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': USER_AGENT
         }
 
         // 如果配置了 PHPSESSID，则添加到 Cookie 中
@@ -93,8 +94,7 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
             const illustPagesRes = await context.http.get(illustPagesUrl, {
                 headers: {
                     Referer: 'https://www.pixiv.net/',
-                    'User-Agent':
-                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                    'User-Agent': USER_AGENT
                 },
                 proxyAgent: this.config.isProxy
                     ? this.config.proxyHost
@@ -158,5 +158,11 @@ export class PixivDiscoverySourceProvider extends SourceProvider {
 
     setConfig(config: Config) {
         this.config = config
+    }
+
+    getMeta(): ImageSourceMeta {
+        return {
+            referer: 'https://www.pixiv.net/'
+        }
     }
 }

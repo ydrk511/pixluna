@@ -4,7 +4,8 @@ import type {
     CommonSourceRequest,
     GeneralImageData,
     ImageMetaData,
-    SourceResponse
+    SourceResponse,
+    ImageSourceMeta
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
 import { logger } from '../../index'
@@ -111,5 +112,11 @@ export class LolisukiSourceProvider extends SourceProvider {
 
     setConfig(config: Config) {
         this.config = config
+    }
+
+    getMeta(): ImageSourceMeta {
+        return {
+            referer: 'https://www.pixiv.net/'
+        }
     }
 }
