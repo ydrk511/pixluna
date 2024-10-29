@@ -4,8 +4,8 @@ import type {
     CommonSourceRequest,
     GeneralImageData,
     ImageMetaData,
-    SourceResponse,
-    ImageSourceMeta
+    ImageSourceMeta,
+    SourceResponse
 } from '../../utils/type'
 import { SourceProvider } from '../../utils/type'
 import { logger } from '../../index'
